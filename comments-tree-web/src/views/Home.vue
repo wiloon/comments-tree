@@ -1,0 +1,92 @@
+<template>
+  <v-container>
+    <v-row class="text-center">
+      <v-col cols="12">
+        <v-dialog
+          v-model="dialog"
+          persistent
+          max-width="290"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-btn
+              color="primary"
+              dark
+              v-bind="attrs"
+              v-on="on"
+            >
+              留言
+            </v-btn>
+          </template>
+          <v-card>
+            <v-card-title class="text-h5">
+              留言
+            </v-card-title>
+            <v-textarea
+              label="留言"
+              auto-grow
+              outlined
+              rows="10"
+              row-height="10"
+              v-model="newMsg"
+            ></v-textarea>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn
+                color="green darken-1"
+                text
+                @click="dialog = false"
+              >
+                取消
+              </v-btn>
+              <v-btn
+                color="green darken-1"
+                text
+                v-on:click="saveMsg"
+              >
+                保存
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-dialog>
+      </v-col>
+    </v-row>
+  </v-container>
+</template>
+
+<script lang="ts">
+import Vue from 'vue'
+import Axios from 'axios'
+
+export default Vue.extend({
+  name: 'Home',
+
+  data: () => ({
+    dialog: false,
+    newMsg: ''
+  }),
+  methods: {
+    saveMsg: function () {
+      console.log('saveMsg')
+      this.dialog = false
+      console.log(this.newMsg)
+
+      Axios.post('/message/save',
+        {
+          msg: this.newMsg
+        }).then((response: any) => {
+        console.log('login response: ' + response)
+        console.log('login response data: ' + response.data)
+        console.log('login response data token: ' + response.data.token)
+        console.log('login response data code: ' + response.data.code)
+        if (response.data.code === 200) {
+          console.log('msg save success')
+          // to third party activate
+          this.$router.push({ name: 'Home' })
+        } else {
+          console.log('msg save failed')
+        }
+      })
+    }
+  }
+})
+</script>

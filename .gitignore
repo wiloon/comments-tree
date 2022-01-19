@@ -1,3 +1,4 @@
 target
 .idea
 *.db
+/comments-tree-web/node_modules/
