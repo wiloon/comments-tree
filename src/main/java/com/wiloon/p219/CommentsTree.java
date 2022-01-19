@@ -9,11 +9,11 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
  * 无限层级留言
  */
 @SpringBootApplication
-public class App {
-    private static final Logger logger = LoggerFactory.getLogger(App.class);
+public class CommentsTree {
+    private static final Logger logger = LoggerFactory.getLogger(CommentsTree.class);
 
     public static void main(String[] args) {
-        logger.info("App starting...");
-        SpringApplication.run(App.class);
+        logger.info("comments tree starting...");
+        SpringApplication.run(CommentsTree.class);
     }
 }

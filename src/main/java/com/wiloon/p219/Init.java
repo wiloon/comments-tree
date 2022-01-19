@@ -1,5 +1,7 @@
 package com.wiloon.p219;
 
+import com.wiloon.p219.user.User;
+import com.wiloon.p219.user.UserRowMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,9 @@ import org.springframework.web.context.ServletContextAware;
 
 import javax.servlet.ServletContext;
 
+/**
+ * init sqlite db
+ */
 @Component
 public class Init implements ServletContextAware {
     private static final Logger logger = LoggerFactory.getLogger(Init.class);
@@ -26,6 +31,9 @@ public class Init implements ServletContextAware {
                 ");");
         jdbcTemplate.execute("CREATE UNIQUE INDEX IF NOT EXISTS index_user_name on users (name);");
         jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS index_user_email ON users (email);");
+        User user = jdbcTemplate.queryForObject("SELECT * FROM users where id=?", new UserRowMapper(), "c31f5e0e-0e0c-4731-97dc-9c6675a0068c");
+        if (user == null)
+            jdbcTemplate.execute("INSERT INTO users VALUES ('c31f5e0e-0e0c-4731-97dc-9c6675a0068c','admin','admin@admin.com','$2a$10$qlnsvLWYrj9VguElAXPTTOQmnCson4QG.vGDiNtaGL5VZgcqc1ix.')");
     }
 
 }

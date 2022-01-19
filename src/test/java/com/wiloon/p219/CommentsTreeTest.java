@@ -7,12 +7,12 @@ import org.junit.Test;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 /**
- * Unit test for simple App.
+ * Unit test for simple CommentsTree.
  */
-public class AppTest   {
+public class CommentsTreeTest {
     @Test
     public void testPasswordHash(){
-        String password = "password0";
+        String password = "admin";
         BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
         String hash =bcryptPasswordEncoder.encode(password);
         System.out.println(hash);
