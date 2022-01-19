@@ -12,7 +12,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 public class CommentsTreeTest {
     @Test
     public void testPasswordHash(){
-        String password = "admin";
+        String password = "0oVHFEqB";
         BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
         String hash =bcryptPasswordEncoder.encode(password);
         System.out.println(hash);
