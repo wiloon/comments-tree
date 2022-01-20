@@ -3,23 +3,23 @@ CREATE TABLE IF NOT EXISTS users (
   name VARCHAR(100) NOT NULL,
   email VARCHAR(100) NOT NULL,
   password VARCHAR(100) NOT NULL,
-  create_time timestamp NOT NULL
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE UNIQUE INDEX IF NOT EXISTS index_user_name on users (name);
 CREATE INDEX IF NOT EXISTS index_user_email ON users (email);
 
-CREATE TABLE IF NOT EXISTS comment(
+CREATE TABLE IF NOT EXISTS comments(
   id INTEGER AUTO_INCREMENT NOT NULL,
   content VARCHAR(300) NOT NULL,
   user_id char(36)  NOT NULL,
-  create_time timestamp NOT NULL,
-  update_time timestamp NOT NULL,
+  create_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  update_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
 );
 
-CREATE TABLE IF NOT EXISTS tree_path(
-  parent INTEGER NOT NULL,
-  child INTEGER NOT NULL,
-  PRIMARY KEY (parent, child)
+CREATE TABLE IF NOT EXISTS comments_tree_path(
+  parent_id INTEGER NOT NULL,
+  child_id INTEGER NOT NULL,
+  PRIMARY KEY (parent_id, child_id)
 );

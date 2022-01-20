@@ -87,6 +87,21 @@ export default Vue.extend({
         }
       })
     }
+  },
+  mounted: function () {
+    console.log('home mounted')
+    Axios.get('/comments',
+      {
+        headers: {},
+        params: {}
+      }).then(
+      response => {
+        console.log('response: ' + response)
+        console.log('response data: ' + response.data)
+        console.log('response data token: ' + response.data.token)
+        console.log('response data code: ' + response.data.code)
+      }
+    )
   }
 })
 </script>
