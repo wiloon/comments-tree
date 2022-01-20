@@ -24,7 +24,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity.authorizeRequests();
         // white list
         registry.antMatchers("/ping").permitAll();
-        registry.antMatchers("/foo").permitAll();
+        registry.antMatchers("/comments").permitAll();
         registry.antMatchers("/user/login").permitAll();
 
         // 跨域的 OPTIONS 请求

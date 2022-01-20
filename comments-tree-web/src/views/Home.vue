@@ -50,19 +50,38 @@
         </v-dialog>
       </v-col>
     </v-row>
+    <v-row>
+
+    </v-row>
+    <v-row>
+      <v-treeview
+        open-all
+        :items="items"
+        item-text="content"
+        item-children="reply"
+      >
+        <template v-slot:label="{ item }">
+          <Comment :content="item.id + item.content"></Comment>
+        </template>
+      </v-treeview>
+    </v-row>
   </v-container>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
 import Axios from 'axios'
+import Comment from '@/components/Comment.vue'
 
 export default Vue.extend({
   name: 'Home',
-
+  components: {
+    Comment
+  },
   data: () => ({
     dialog: false,
-    newMsg: ''
+    newMsg: '',
+    items: []
   }),
   methods: {
     saveMsg: function () {
@@ -98,8 +117,9 @@ export default Vue.extend({
       response => {
         console.log('response: ' + response)
         console.log('response data: ' + response.data)
-        console.log('response data token: ' + response.data.token)
         console.log('response data code: ' + response.data.code)
+        console.log('response data code: ' + response.data.data.id)
+        this.items = response.data.data.reply
       }
     )
   }

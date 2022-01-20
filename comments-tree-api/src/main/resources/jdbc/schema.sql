@@ -23,3 +23,5 @@ CREATE TABLE IF NOT EXISTS comments_tree_path(
   child_id INTEGER NOT NULL,
   PRIMARY KEY (parent_id, child_id)
 );
+
+

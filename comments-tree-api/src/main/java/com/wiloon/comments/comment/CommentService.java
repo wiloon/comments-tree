@@ -19,7 +19,7 @@ public class CommentService {
     }
 
     public List<Comment> findAllComments() {
-        String sql = "SELECT ctp.parent_id,c.id,c.content,c.user_id,c.create_time,c.update_time from comments c JOIN comments_tree_path ctp ON c.id=ctp.child_id";
+        String sql = "SELECT ctp.parent_id,c.id,c.content,c.user_id,c.create_time,c.update_time from comments c JOIN comments_tree_path ctp ON c.id=ctp.child_id order by ctp.parent_id,ctp.child_id";
         return jdbcTemplate.query(sql, new CommentRowMapper());
     }
 

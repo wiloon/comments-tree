@@ -54,4 +54,7 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     public int getId() {
         return this.comment==null?0:this.comment.getId();
     }
+    public String getContent(){
+        return this.comment==null?"":this.comment.getContent();
+    }
 }

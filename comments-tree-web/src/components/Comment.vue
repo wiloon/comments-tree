@@ -1,15 +1,15 @@
 <template>
-  <v-container>
-  </v-container>
+  <div>
+    {{ content }}
+  </div>
 </template>
 
 <script lang="ts">
 import Vue from 'vue'
-import Axios from 'axios'
 
 export default Vue.extend({
   name: 'Comment',
-
+  props: ['content'],
   data: () => ({
     dialog: false,
     newMsg: ''
