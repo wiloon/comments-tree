@@ -61,7 +61,7 @@
         item-children="reply"
       >
         <template v-slot:label="{ item }">
-          <Comment :content="item.id + item.content"></Comment>
+          <Comment :content="item.content" :commentId="item.id" v-on:comment-reply="reply"></Comment>
         </template>
       </v-treeview>
     </v-row>
@@ -81,9 +81,15 @@ export default Vue.extend({
   data: () => ({
     dialog: false,
     newMsg: '',
-    items: []
+    items: [],
+    replyCommentId: 0
   }),
   methods: {
+    reply: function (commentId: number) {
+      console.log('reply to: ' + commentId)
+      this.replyCommentId = commentId
+      this.dialog = true
+    },
     saveMsg: function () {
       console.log('saveMsg')
       this.dialog = false
@@ -91,7 +97,8 @@ export default Vue.extend({
 
       Axios.post('/comment',
         {
-          content: this.newMsg
+          content: this.newMsg,
+          parentId: this.replyCommentId
         }).then((response: any) => {
         console.log('login response: ' + response)
         console.log('login response data: ' + response.data)

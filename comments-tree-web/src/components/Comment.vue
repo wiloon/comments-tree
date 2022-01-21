@@ -1,6 +1,15 @@
 <template>
   <div>
-    {{ content }}
+    <v-row>
+      <v-col>
+        #{{ commentId }}: {{ content }}
+      </v-col>
+      <v-col>
+        <v-btn color="primary" @click="reply">
+          评论
+        </v-btn>
+      </v-col>
+    </v-row>
   </div>
 </template>
 
@@ -9,14 +18,15 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'Comment',
-  props: ['content'],
+  props: ['content', 'commentId'],
   data: () => ({
     dialog: false,
     newMsg: ''
   }),
   methods: {
-    placeholder: function () {
-      console.log('placeholder')
+    reply: function () {
+      console.log('reply, emit, comment id: ' + this.commentId)
+      this.$emit('comment-reply', this.commentId)
     }
   }
 })

@@ -38,7 +38,7 @@ public class CommentController {
         String UserId = (String) session.getAttribute("userId");
 
         try {
-            int id = commentService.newComment(jsonParam.getStr("content"), UserId, 0);
+            int id = commentService.newComment(jsonParam.getStr("content"), UserId, jsonParam.getInt("parentId"));
             logger.info("new comment created, id: {}", id);
             return JSON.toJSONString(CommonResult.success("msg save"));
         } catch (Exception e) {
