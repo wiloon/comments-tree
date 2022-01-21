@@ -1,6 +1,9 @@
 package com.wiloon.comments.user;
 
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+
 public class User {
+    private static final BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
     private String id;
     private String name;
     private String email;
@@ -44,6 +47,10 @@ public class User {
 
     @Override
     public String toString() {
-        return String.format("User, id: %s, name: %s, password: %s",this.id,this.name,this.password);
+        return String.format("User, id: %s, name: %s, password: %s", this.id, this.name, this.password);
+    }
+
+    public boolean isPasswordMatch(String password) {
+        return bcryptPasswordEncoder.matches(password, this.getPassword());
     }
 }

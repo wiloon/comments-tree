@@ -89,9 +89,9 @@ export default Vue.extend({
       this.dialog = false
       console.log(this.newMsg)
 
-      Axios.post('/message/save',
+      Axios.post('/comment',
         {
-          msg: this.newMsg
+          content: this.newMsg
         }).then((response: any) => {
         console.log('login response: ' + response)
         console.log('login response data: ' + response.data)
@@ -100,28 +100,32 @@ export default Vue.extend({
         if (response.data.code === 200) {
           console.log('msg save success')
           // to third party activate
-          this.$router.push({ name: 'Home' })
+          this.loadCommentsTree()
         } else {
           console.log('msg save failed')
         }
+        this.newMsg = ''
       })
+    },
+    loadCommentsTree: function () {
+      console.log('home mounted')
+      Axios.get('/comments',
+        {
+          headers: {},
+          params: {}
+        }).then(
+        response => {
+          console.log('response: ' + response)
+          console.log('response data: ' + response.data)
+          console.log('response data code: ' + response.data.code)
+          console.log('response data code: ' + response.data.data.id)
+          this.items = response.data.data.reply
+        }
+      )
     }
   },
   mounted: function () {
-    console.log('home mounted')
-    Axios.get('/comments',
-      {
-        headers: {},
-        params: {}
-      }).then(
-      response => {
-        console.log('response: ' + response)
-        console.log('response data: ' + response.data)
-        console.log('response data code: ' + response.data.code)
-        console.log('response data code: ' + response.data.data.id)
-        this.items = response.data.data.reply
-      }
-    )
+    this.loadCommentsTree()
   }
 })
 </script>

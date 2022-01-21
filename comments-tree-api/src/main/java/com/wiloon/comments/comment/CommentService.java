@@ -4,8 +4,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
+import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.support.GeneratedKeyHolder;
+import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.*;
 
 @Service
@@ -13,10 +21,6 @@ public class CommentService {
     private static final Logger logger = LoggerFactory.getLogger(CommentService.class);
     @Autowired
     private JdbcTemplate jdbcTemplate;
-
-    public void save() {
-        jdbcTemplate.execute("INSERT INTO beers VALUES ('Stella')");
-    }
 
     public List<Comment> findAllComments() {
         String sql = "SELECT ctp.parent_id,c.id,c.content,c.user_id,c.create_time,c.update_time from comments c JOIN comments_tree_path ctp ON c.id=ctp.child_id order by ctp.parent_id,ctp.child_id";
@@ -51,5 +55,25 @@ public class CommentService {
 
     public void setJdbcTemplate(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+    }
+
+    public int newComment(String content, String UserId, int parentId) throws Exception {
+        String sql = "INSERT INTO comments (content, user_id) VALUES (?,?);";
+        KeyHolder keyHolder = new GeneratedKeyHolder();
+        jdbcTemplate.update(connection -> {
+            // 指定主键
+            PreparedStatement preparedStatement = connection.prepareStatement(sql, new String[]{"id"});
+            preparedStatement.setString(1, content);
+            preparedStatement.setString(2, UserId);
+            return preparedStatement;
+        }, keyHolder);
+        if (keyHolder.getKey() == null) {
+            throw new Exception("failed to save comment");
+        }
+        int commentId = keyHolder.getKey().intValue();
+        String treePathSql = "insert INTO `comments_tree_path` (`parent_id`, `child_id`) VALUES (?, ?);";
+        jdbcTemplate.update(treePathSql, parentId, commentId);
+        return commentId;
+
     }
 }
