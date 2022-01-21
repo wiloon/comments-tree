@@ -71,7 +71,7 @@ public class CommentService {
             throw new Exception("failed to save comment");
         }
         int commentId = keyHolder.getKey().intValue();
-        String treePathSql = "insert INTO `comments_tree_path` (`parent_id`, `child_id`) VALUES (?, ?);";
+        String treePathSql = "INSERT INTO `comments_tree_path` (`parent_id`, `child_id`) VALUES (?, ?);";
         jdbcTemplate.update(treePathSql, parentId, commentId);
         return commentId;
 

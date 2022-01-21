@@ -8,14 +8,28 @@
               <v-form ref="loginForm" v-model="valid" lazy-validation>
                 <v-row>
                   <v-col cols="12">
-                    <v-text-field data-cy="user-name" v-model="userName" :rules="userNameRule" label="用户名"
-                                  required></v-text-field>
+                    <v-text-field
+                      data-cy="user-name"
+                      v-model="userName"
+                      :rules="userNameRule"
+                      label="用户名"
+                      required>
+                    </v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-text-field
+                      data-cy="email"
+                      v-model="email"
+                      :rules="emailRule"
+                      label="邮箱"
+                      required>
+                    </v-text-field>
                   </v-col>
                   <v-col cols="12">
                     <v-text-field
                       data-cy="password"
                       v-model="password"
-                      :rules="[passwordRule.required, passwordRule.min]"
+                      :rules="[passwordRule.required, passwordRule.min, passwordRule.max,passwordRule.complexity]"
                       label="密码" hint="密码长度至少8位"
                       type="password"
                       counter>
@@ -33,9 +47,9 @@
                       block
                       :disabled="!valid"
                       color="primary"
-                      @click="login"
-                      data-cy="login"
-                    >登录
+                      @click="register"
+                      data-cy="login">
+                      注册
                     </v-btn>
                   </v-col>
                 </v-row>
@@ -73,7 +87,7 @@ import Axios from 'axios'
 @Component({
   components: {}
 })
-export default class About extends Vue {
+export default class Register extends Vue {
   showCorpWechatLogin = true
   snackbar = false
   snackbarColor = 'success'
@@ -91,26 +105,36 @@ export default class About extends Vue {
 
   userName = ''
   password = ''
+  email = ''
+  isUserLogin = false
   userNameRule = [
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     (v: string) => !!v || '请输入用户名',
-    (v: string) => /^[a-zA-Z0-9._-]{4,16}$/.test(v) || '无效的用户名'
+    (v: string) => /^[a-zA-Z0-9._-]{5,20}$/.test(v) || '无效的用户名'
+  ]
+
+  emailRule = [
+    (v: string) => !!v || '请输入邮箱',
+    (v: string) => /^[0-9a-zA-Z_.-]+[@][0-9a-zA-Z_.-]+([.][a-zA-Z]+){1,2}$/.test(v) || '无效的邮箱'
   ]
 
   passwordRule = {
     required: (value: string) => !!value || '请输入密码',
-    min: (v: string) => (v && v.length >= 8) || '密码长度至少8位'
+    min: (v: string) => (v && v.length >= 8) || '密码长度至少8位',
+    max: (v: string) => (v && v.length <= 20) || '密码长度少于20位',
+    complexity: (v: string) => /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d)(?=.*?[!@#$%^&*()\-_=+;])[a-zA-Z\d!@#$%^&*()\-_=+;]*$/.test(v) || '密码复杂度太低,至少包含一个大写、一个小写、一个数字、一个特殊符号(!@#$%^&*()-_=+;)'
   }
 
-  login (): void {
+  // user register
+  register (): void {
     if ((this.$refs.loginForm as Vue & { validate: () => boolean }).validate()) {
-      Axios.post('/user/login',
+      Axios.post('/user',
         {
           name: this.userName,
+          email: this.email,
           password: this.password
         }).then((response: any) => {
         if (response.data.code === 200) {
-          console.log('login success')
+          console.log('register success')
           this.$store.commit('login')
           console.log('login status: ' + this.$store.state.login)
           this.$router.push({ name: 'Home' })

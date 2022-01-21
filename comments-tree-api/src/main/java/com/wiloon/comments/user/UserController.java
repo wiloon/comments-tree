@@ -42,6 +42,9 @@ public class UserController {
         return "pong";
     }
 
+    /**
+     * 用户登录
+     */
     @RequestMapping(value = "/user/login", method = RequestMethod.POST)
     @ResponseBody
     public String login(@RequestBody JSONObject jsonParam, HttpSession session) {
@@ -51,14 +54,54 @@ public class UserController {
         if (user == null) {
             return JSON.toJSONString(CommonResult.failed("用户不存在"));
         } else if (user.isPasswordMatch(jsonParam.getStr("password"))) {
-            AdminUserDetails adminUserDetails = new AdminUserDetails(user);
-            UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(adminUserDetails, null, adminUserDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
+            setAuthentication(user);
             logger.info("login by user name success: {}", user);
             session.setAttribute("userId", user.getId());
             return JSON.toJSONString(CommonResult.success("登录成功"));
         } else {
             return JSON.toJSONString(CommonResult.failed("登录失败"));
         }
+    }
+
+    /**
+     * 用户注册
+     */
+    @RequestMapping(value = "/user", method = RequestMethod.POST)
+    @ResponseBody
+    public String register(@RequestBody JSONObject jsonParam, HttpSession session) {
+        logger.info("params: {}", jsonParam.toStringPretty());
+        String name = jsonParam.getStr("name");
+        String email = jsonParam.getStr("email");
+        String password = jsonParam.getStr("password");
+        if (userService.isUserRegistered(name, email)) {
+            return JSON.toJSONString(CommonResult.failed("用户已存在"));
+        }
+        String id = userService.userRegister(name, email, password);
+        if (id == null || "".equals(id)) {
+            return JSON.toJSONString(CommonResult.failed("用户注册失败"));
+        }
+        User user = userService.getUserById(id);
+        setAuthentication(user);
+        session.setAttribute("userId", user.getId());
+        return JSON.toJSONString(CommonResult.success("注册成功"));
+    }
+
+    private void setAuthentication(User user) {
+        AdminUserDetails adminUserDetails = new AdminUserDetails(user);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(adminUserDetails, null, adminUserDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        logger.info("login by user name success: {}", user);
+    }
+
+    @RequestMapping(value = "/logout", method = RequestMethod.POST)
+    @ResponseBody
+    public CommonResult logout() {
+        return CommonResult.success(null);
+    }
+
+    @RequestMapping(value = "/session", method = RequestMethod.GET)
+    @ResponseBody
+    public String sessionCheck() {
+        return JSON.toJSONString(CommonResult.success(""));
     }
 }

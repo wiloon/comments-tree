@@ -122,10 +122,6 @@ export default Vue.extend({
           params: {}
         }).then(
         response => {
-          console.log('response: ' + response)
-          console.log('response data: ' + response.data)
-          console.log('response data code: ' + response.data.code)
-          console.log('response data code: ' + response.data.data.id)
           this.items = response.data.data.reply
         }
       )
