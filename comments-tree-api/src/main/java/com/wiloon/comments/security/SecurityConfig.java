@@ -26,23 +26,26 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         registry.antMatchers("/ping").permitAll();
         registry.antMatchers("/comments").permitAll();
         registry.antMatchers("/user/login").permitAll();
+        registry.antMatchers("/user").permitAll();
 
         // 跨域的 OPTIONS 请求
         registry.antMatchers(HttpMethod.OPTIONS).permitAll();
+
         // 其他请求都需要身份认证
-        registry.and()
-                .authorizeRequests()
+        registry.and().logout()
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("http://localhost:8080/")
+                .deleteCookies("JSESSIONID")
+                .and().authorizeRequests()
                 .anyRequest()
                 .authenticated()
                 // 关闭 csrf
-                .and()
-                .csrf()
+                .and().csrf()
                 .disable()
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.ALWAYS) // 使用session
                 // 自定义权限拒绝类
-                .and()
-                .exceptionHandling()
+                .and().exceptionHandling()
                 .accessDeniedHandler(restfulAccessDeniedHandler())
                 .authenticationEntryPoint(restAuthenticationEntryPoint());
     }
