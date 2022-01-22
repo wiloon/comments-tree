@@ -3,6 +3,7 @@ package com.wiloon.comments.security;
 import com.alibaba.fastjson.JSON;
 import com.wiloon.comments.common.CommonResult;
 import com.wiloon.comments.user.CommentsTreeUserDetails;
+import com.wiloon.comments.user.User;
 import com.wiloon.comments.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -48,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity.authorizeRequests();
         // white list
-        registry.antMatchers(HttpMethod.POST, "/session").permitAll(); // user login
+        registry.antMatchers(HttpMethod.POST, "/session").permitAll(); // 用户登录
         registry.antMatchers("/ping").permitAll();
         registry.antMatchers("/comments").permitAll();
         registry.antMatchers("/user").permitAll();
@@ -56,7 +57,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // 跨域的 OPTIONS 请求
         registry.antMatchers(HttpMethod.OPTIONS).permitAll();
 
-        // 其他请求都需要身份认证
+        // logout
         registry.and().logout()
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("http://localhost:8080/")
@@ -73,6 +74,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().exceptionHandling()
                 .accessDeniedHandler(restfulAccessDeniedHandler())
                 .authenticationEntryPoint(restAuthenticationEntryPoint())
+                // remember me
                 .and().rememberMe()
                 .rememberMeParameter("rememberMe")
                 .tokenRepository(persistentTokenRepository())
@@ -82,7 +84,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     @Override
                     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
                         CommentsTreeUserDetails user = (CommentsTreeUserDetails) userService.loadUserByUsername(authentication.getName());
-                        request.getSession().setAttribute("userId", user.getUserId());
+                        request.getSession().setAttribute(User.SESSION_USER_ID_KEY, user.getUserId());
 
                     }
                 })

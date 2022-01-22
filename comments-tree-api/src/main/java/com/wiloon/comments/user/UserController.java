@@ -75,7 +75,7 @@ public class UserController {
         }
         User user = userService.getUserById(id);
         setAuthentication(user);
-        session.setAttribute("userId", user.getId());
+        session.setAttribute(User.SESSION_USER_ID_KEY, user.getId());
         return JSON.toJSONString(CommonResult.success("注册成功"));
     }
 
@@ -86,9 +86,17 @@ public class UserController {
         logger.info("login by user name success: {}", user);
     }
 
+    /**
+     * 检查session是否有效并返回用户信息, session过期时会被 spring security 拦截掉 返回 状态码401
+     * @param session 用户 session
+     * @return 用户信息
+     */
     @RequestMapping(value = "/session", method = RequestMethod.GET)
     @ResponseBody
-    public String sessionCheck() {
-        return JSON.toJSONString(CommonResult.success(""));
+    public String sessionCheck(HttpSession session) {
+        logger.info("session check");
+        String userId = (String) session.getAttribute(User.SESSION_USER_ID_KEY);
+        User user = userService.getUserById(userId);
+        return JSON.toJSONString(CommonResult.success(user));
     }
 }

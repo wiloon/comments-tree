@@ -111,6 +111,7 @@ export default class Login extends Vue {
           console.log('login success')
           this.$store.commit('login')
           console.log('login status: ' + this.$store.state.login)
+          this.$store.commit('updateUserInfo', { info: response.data.data.name + ' (' + response.data.data.email + ')' })
           this.$router.push({ name: 'Home' })
         } else {
           this.snackbarColor = 'error'

@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -22,11 +23,21 @@ public class CommentService {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /**
+     * 查询所有留言和评论，关联 comments 表和 comments_tree_path 表，原始数据。
+     *
+     * @return Comment 列表
+     */
     public List<Comment> findAllComments() {
         String sql = "SELECT ctp.parent_id,c.id,c.content,c.user_id,c.create_time,c.update_time from comments c JOIN comments_tree_path ctp ON c.id=ctp.child_id order by ctp.parent_id,ctp.child_id";
         return jdbcTemplate.query(sql, new CommentRowMapper());
     }
 
+    /**
+     * 排序后的留言和评论
+     *
+     * @return comments 树形结构的根节点
+     */
     public CommentsTreeNode getSortedComments() {
         List<Comment> comments = findAllComments();
         logger.debug("comments size: {}", comments.size());
@@ -57,7 +68,16 @@ public class CommentService {
         this.jdbcTemplate = jdbcTemplate;
     }
 
-    public int newComment(String content, String UserId, int parentId) throws Exception {
+    /**
+     * 新建留言/评论
+     *
+     * @param content  留言内容
+     * @param UserId   用户 ID
+     * @param parentId 本留言的父节点 ID
+     * @return 本留言/评论 的 ID, comments 表自增主键新值
+     */
+    @Transactional
+    public int newComment(String content, String UserId, int parentId) {
         String sql = "INSERT INTO comments (content, user_id) VALUES (?,?);";
         KeyHolder keyHolder = new GeneratedKeyHolder();
         jdbcTemplate.update(connection -> {
@@ -68,7 +88,7 @@ public class CommentService {
             return preparedStatement;
         }, keyHolder);
         if (keyHolder.getKey() == null) {
-            throw new Exception("failed to save comment");
+            throw new RuntimeException("failed to save comment");
         }
         int commentId = keyHolder.getKey().intValue();
         String treePathSql = "INSERT INTO `comments_tree_path` (`parent_id`, `child_id`) VALUES (?, ?);";

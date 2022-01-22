@@ -30,6 +30,10 @@ public class CommentsTreeUserDetails implements UserDetails {
         return this.user.getId();
     }
 
+    public User getUser() {
+        return user;
+    }
+
     @Override
     public String getPassword() {
         return password;

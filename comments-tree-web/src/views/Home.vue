@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col>
-        <v-btn color="primary" @click="newComment" v-if="!this.$store.state.login">
+        <v-btn color="primary" @click="newComment" v-if="this.$store.state.login">
           留言
         </v-btn>
       </v-col>
@@ -51,8 +51,10 @@
 
     </v-row>
     <v-row>
+      <!-- 树形留言 -->
       <v-treeview
         open-all
+        :open="nodeOpen"
         :items="items"
         item-text="content"
         item-children="reply"
@@ -79,7 +81,8 @@ export default Vue.extend({
     dialog: false,
     newMsg: '',
     items: [],
-    replyCommentId: 0
+    replyCommentId: 0,
+    nodeOpen: []
   }),
   methods: {
     newComment: function () {

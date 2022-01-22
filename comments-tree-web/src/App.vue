@@ -11,14 +11,12 @@
 
       <v-spacer></v-spacer>
 
-      <v-btn
-        href=""
-        target="_blank"
-        text
+      <v-chip
+        v-if="this.$store.state.login"
+        class="ma-2"
       >
-        <span class="mr-2">Name</span>
-        <v-icon>mdi-open-in-new</v-icon>
-      </v-btn>
+        {{ userInfo }}
+      </v-chip>
       <v-btn v-on:click="login" class="navBarItem" v-if="!this.$store.state.login" data-cy="login-dialog">登录</v-btn>
       <v-btn v-on:click="register" class="navBarItem" v-if="!this.$store.state.login">注册</v-btn>
       <v-btn v-on:click="logout" class="navBarItem" v-if="this.$store.state.login">退出</v-btn>
@@ -37,9 +35,7 @@ import Axios from 'axios'
 export default Vue.extend({
   name: 'App',
 
-  data: () => ({
-    //
-  }),
+  data: () => ({}),
   methods: {
     login: function () {
       console.log('login')
@@ -77,11 +73,17 @@ export default Vue.extend({
         console.log('session response data code: ' + response.data.code)
         if (response.data.code === 200) {
           this.$store.commit('login')
+          this.$store.commit('updateUserInfo', { info: response.data.data.name + ' (' + response.data.data.email + ')' })
         } else {
           this.$store.commit('logout')
         }
       }
     )
+  },
+  computed: {
+    userInfo () {
+      return this.$store.state.userInfo
+    }
   }
 })
 </script>

@@ -6,7 +6,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     count: 0,
-    login: false
+    login: false,
+    userInfo: ''
   },
   mutations: {
     increment (state) {
@@ -17,10 +18,11 @@ export default new Vuex.Store({
     },
     logout (state) {
       state.login = false
+    },
+    updateUserInfo (state, payload) {
+      state.userInfo = payload.info
     }
   },
-  actions: {
-  },
-  modules: {
-  }
+  actions: {},
+  modules: {}
 })
