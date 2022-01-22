@@ -3,6 +3,7 @@ package com.wiloon.comments.user;
 import cn.hutool.json.JSONObject;
 import com.alibaba.fastjson.JSON;
 import com.wiloon.comments.common.CommonResult;
+import com.wiloon.comments.common.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,46 +23,38 @@ public class UserController {
 
     @RequestMapping(value = "/ping", method = RequestMethod.GET)
     @ResponseBody
-    public String ping(@RequestParam(value = "key", required = false) String key) {
-        logger.info("key:{}", key);
+    public String ping() {
+        logger.info("ping");
         return "pong";
     }
 
-    @RequestMapping("/bar")
-    @ResponseBody
-    public String get() {
-        return "pong";
-    }
-
-    @PostMapping("/user/register")
-    @ResponseBody
-    public String register(@RequestParam("name") String name,
-                           @RequestParam("email") String email,
-                           @RequestParam("password") String password) {
-        userService.createUser(name, email, password);
-        return "pong";
-    }
-
-    /**
-     * 用户登录
-     */
-    @RequestMapping(value = "/user/login", method = RequestMethod.POST)
-    @ResponseBody
-    public String login(@RequestBody JSONObject jsonParam, HttpSession session) {
-        logger.info("params: {}", jsonParam.toStringPretty());
-        User user = userService.getUserByName(jsonParam.getStr("name"));
-
-        if (user == null) {
-            return JSON.toJSONString(CommonResult.failed("用户不存在"));
-        } else if (user.isPasswordMatch(jsonParam.getStr("password"))) {
-            setAuthentication(user);
-            logger.info("login by user name success: {}", user);
-            session.setAttribute("userId", user.getId());
-            return JSON.toJSONString(CommonResult.success("登录成功"));
-        } else {
-            return JSON.toJSONString(CommonResult.failed("登录失败"));
-        }
-    }
+//    /**
+//     * 用户登录
+//     */
+//    @RequestMapping(value = "/login", method = RequestMethod.POST)
+//    @ResponseBody
+//    public String login(@RequestBody JSONObject jsonParam, HttpSession session) {
+//        logger.info("params: {}", jsonParam.toStringPretty());
+//        String nameOrEmail = jsonParam.getStr("username");
+//
+//        User user;
+//        if (Utils.isEmail(nameOrEmail)) {
+//            user = userService.getUserByEmail(nameOrEmail);
+//        } else {
+//            user = userService.getUserByName(nameOrEmail);
+//        }
+//
+//        if (user == null) {
+//            return JSON.toJSONString(CommonResult.failed("用户不存在"));
+//        } else if (user.isPasswordMatch(jsonParam.getStr("password"))) {
+//            setAuthentication(user);
+//            logger.info("login by user name success: {}", user);
+//            session.setAttribute("userId", user.getId());
+//            return JSON.toJSONString(CommonResult.success("登录成功"));
+//        } else {
+//            return JSON.toJSONString(CommonResult.failed("登录失败"));
+//        }
+//    }
 
     /**
      * 用户注册
@@ -87,16 +80,10 @@ public class UserController {
     }
 
     private void setAuthentication(User user) {
-        AdminUserDetails adminUserDetails = new AdminUserDetails(user);
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(adminUserDetails, null, adminUserDetails.getAuthorities());
+        CommentsTreeUserDetails commentsTreeUserDetails = new CommentsTreeUserDetails(user);
+        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(commentsTreeUserDetails, null, commentsTreeUserDetails.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(authentication);
         logger.info("login by user name success: {}", user);
-    }
-
-    @RequestMapping(value = "/logout", method = RequestMethod.POST)
-    @ResponseBody
-    public CommonResult logout() {
-        return CommonResult.success(null);
     }
 
     @RequestMapping(value = "/session", method = RequestMethod.GET)

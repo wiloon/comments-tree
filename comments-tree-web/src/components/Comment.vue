@@ -5,7 +5,7 @@
         #{{ commentId }}: {{ content }}
       </v-col>
       <v-col>
-        <v-btn color="primary" @click="reply">
+        <v-btn color="primary" @click="reply" v-if="this.$store.state.login">
           评论
         </v-btn>
       </v-col>

@@ -1,35 +1,32 @@
 package com.wiloon.comments.user;
 
+import com.alibaba.fastjson.JSON;
+import com.wiloon.comments.common.CommonResult;
+import com.wiloon.comments.common.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
 
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
     @Autowired
     private JdbcTemplate jdbcTemplate;
     private static final BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
 
-    public void createUser(String name, String email, String password) {
-        User user = new User(name);
-        user.setEmail(email);
-
-        String hashPass = bcryptPasswordEncoder.encode(password);
-
-        user.setPassword(hashPass);
-        user.setId(UUID.randomUUID().toString());
-        jdbcTemplate.execute("INSERT INTO beers VALUES ('Stella')");
-        logger.info("user created: {}", user);
-    }
-
     public User getUserByName(String name) {
         return jdbcTemplate.queryForObject("SELECT * FROM users where name=?", new UserRowMapper(), name);
+    }
+    public User getUserByEmail(String email) {
+        return jdbcTemplate.queryForObject("SELECT * FROM users where email=?", new UserRowMapper(), email);
     }
     public User getUserById(String id) {
         return jdbcTemplate.queryForObject("SELECT * FROM users where id=?", new UserRowMapper(), id);
@@ -53,5 +50,17 @@ public class UserService {
         String id = UUID.randomUUID().toString();
         int result = jdbcTemplate.update(sql, id, name, email, hashPassword(password));
         return result > 0 ? id : "";
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String nameOrEmail) throws UsernameNotFoundException {
+        logger.info("loadUserByUsername: {}", nameOrEmail);
+        User user;
+        if (Utils.isEmail(nameOrEmail)) {
+            user = getUserByEmail(nameOrEmail);
+        } else {
+            user = getUserByName(nameOrEmail);
+        }
+        return new CommentsTreeUserDetails(user);
     }
 }

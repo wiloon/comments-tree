@@ -1,5 +1,12 @@
 <template>
   <v-container>
+    <v-row>
+      <v-col>
+        <v-btn color="primary" @click="newComment" v-if="this.$store.state.login">
+          留言
+        </v-btn>
+      </v-col>
+    </v-row>
     <v-row class="text-center">
       <v-col cols="12">
         <v-dialog
@@ -7,16 +14,6 @@
           persistent
           max-width="290"
         >
-          <template v-slot:activator="{ on, attrs }">
-            <v-btn
-              color="primary"
-              dark
-              v-bind="attrs"
-              v-on="on"
-            >
-              留言
-            </v-btn>
-          </template>
           <v-card>
             <v-card-title class="text-h5">
               留言
@@ -85,6 +82,9 @@ export default Vue.extend({
     replyCommentId: 0
   }),
   methods: {
+    newComment: function () {
+      this.dialog = true
+    },
     reply: function (commentId: number) {
       console.log('reply to: ' + commentId)
       this.replyCommentId = commentId

@@ -19,7 +19,7 @@
         <span class="mr-2">Name</span>
         <v-icon>mdi-open-in-new</v-icon>
       </v-btn>
-      <v-btn v-on:click="login" class="navBarItem" v-if="!this.$store.state.login">登录</v-btn>
+      <v-btn v-on:click="login" class="navBarItem" v-if="!this.$store.state.login" data-cy="login-dialog">登录</v-btn>
       <v-btn v-on:click="register" class="navBarItem" v-if="!this.$store.state.login">注册</v-btn>
       <v-btn v-on:click="logout" class="navBarItem" v-if="this.$store.state.login">退出</v-btn>
     </v-app-bar>

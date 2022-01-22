@@ -1,6 +1,7 @@
 import Vue from 'vue'
 import VueRouter, { RouteConfig } from 'vue-router'
 import Home from '../views/Home.vue'
+import axios from 'axios'
 
 Vue.use(VueRouter)
 
@@ -32,4 +33,16 @@ router.beforeEach((to, from, next) => {
   console.log('router, before each, from: ' + from.name + ', to: ' + to.name)
   next()
 })
+
+axios.interceptors.response.use(function (response) {
+  return response
+}, function (error) {
+  console.log('error.response.status: ' + error.response.status)
+  if (error.response.status === 401) {
+    router.push('/login')
+    return Promise.reject(error)
+  }
+  return Promise.reject(error)
+})
+
 export default router

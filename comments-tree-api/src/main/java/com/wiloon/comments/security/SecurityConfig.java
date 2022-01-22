@@ -1,5 +1,9 @@
 package com.wiloon.comments.security;
 
+import com.alibaba.fastjson.JSON;
+import com.wiloon.comments.common.CommonResult;
+import com.wiloon.comments.user.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -11,21 +15,34 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    @Autowired
+    UserService userService;
+
 
     @Override
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity.authorizeRequests();
         // white list
+        registry.antMatchers(HttpMethod.POST, "/login").permitAll(); // user login
         registry.antMatchers("/ping").permitAll();
         registry.antMatchers("/comments").permitAll();
-        registry.antMatchers("/user/login").permitAll();
         registry.antMatchers("/user").permitAll();
 
         // 跨域的 OPTIONS 请求
@@ -47,7 +64,45 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // 自定义权限拒绝类
                 .and().exceptionHandling()
                 .accessDeniedHandler(restfulAccessDeniedHandler())
-                .authenticationEntryPoint(restAuthenticationEntryPoint());
+                .authenticationEntryPoint(restAuthenticationEntryPoint())
+                .and().rememberMe()
+                .tokenValiditySeconds(30 * 24 * 60 * 60)
+                .userDetailsService(userDetailsService())
+                .and().formLogin()
+                .loginProcessingUrl("/session")
+                .usernameParameter("nameOrEmail")
+                .successHandler(loginAuthenticationSuccessHandler())
+                .and().addFilterAt(loginFilter(), UsernamePasswordAuthenticationFilter.class)
+        ;
+        // httpSecurity.addFilterAt(UsernamePasswordAuthenticationFilter.class);
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler loginAuthenticationSuccessHandler() {
+        return new DefaultAuthenticationSuccessHandler();
+    }
+
+    @Bean
+    public LoginFilter loginFilter() {
+        LoginFilter loginFilter = new LoginFilter();
+        loginFilter.setAuthenticationSuccessHandler(new DefaultAuthenticationSuccessHandler());
+        loginFilter.setAuthenticationFailureHandler((request, response, exception) -> {
+            String accessControlAllowOrigin = request.getHeader("Access-Control-Allow-Origin");
+
+            response.addHeader("Access-Control-Allow-Origin", accessControlAllowOrigin);
+            response.addHeader("Access-Control-Allow-Credentials", "true");
+
+            response.setContentType("text/json;charset=UTF-8");
+            response.getWriter().println(JSON.toJSONString(CommonResult.failed("登录失败")));
+            response.setStatus(HttpServletResponse.SC_OK);
+            response.flushBuffer();
+        });
+        return loginFilter;
+    }
+
+    @Override
+    public UserDetailsService userDetailsService() {
+        return userService;
     }
 
     @Override

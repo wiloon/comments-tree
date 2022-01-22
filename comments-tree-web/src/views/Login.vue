@@ -8,7 +8,7 @@
               <v-form ref="loginForm" v-model="valid" lazy-validation>
                 <v-row>
                   <v-col cols="12">
-                    <v-text-field data-cy="user-name" v-model="userName" :rules="userNameRule" label="用户名"
+                    <v-text-field data-cy="user-name" v-model="nameOrEmail" :rules="userNameRule" label="用户名/邮箱"
                                   required></v-text-field>
                   </v-col>
                   <v-col cols="12">
@@ -22,11 +22,12 @@
                     </v-text-field>
                   </v-col>
                   <v-col class="d-flex" cols="12" sm="6" xsm="12">
-                    <v-btn text @click="cancel">
-                      取消
-                    </v-btn>
+                    <v-checkbox
+                      v-model="rememberMe"
+                      label="记住我"
+                    ></v-checkbox>
                   </v-col>
-                  <v-spacer></v-spacer>
+
                   <v-col class="d-flex" cols="12" sm="3" xsm="12" align-end>
                     <v-btn
                       x-large
@@ -36,6 +37,9 @@
                       @click="login"
                       data-cy="login"
                     >登录
+                    </v-btn>
+                    <v-btn x-large block @click="cancel">
+                      取消
                     </v-btn>
                   </v-col>
                 </v-row>
@@ -73,28 +77,20 @@ import Axios from 'axios'
 @Component({
   components: {}
 })
-export default class About extends Vue {
-  showCorpWechatLogin = true
+export default class Login extends Vue {
+  rememberMe = true
   snackbar = false
   snackbarColor = 'success'
   snackbarText = ''
-  show1 = true
   dialog = true
   valid = true
-  tab = 0
-  multiLine = true
-  text = 'I\'m a multi-line snackbar.'
-  options = {
-    isLoggingIn: true,
-    shouldStayLoggedIn: true
-  }
+  text = ''
 
-  userName = ''
+  nameOrEmail = ''
   password = ''
   userNameRule = [
-    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     (v: string) => !!v || '请输入用户名',
-    (v: string) => /^[a-zA-Z0-9._-]{4,16}$/.test(v) || '无效的用户名'
+    (v: string) => /^[a-zA-Z0-9@._-]{4,16}$/.test(v) || '无效的用户名'
   ]
 
   passwordRule = {
@@ -104,12 +100,14 @@ export default class About extends Vue {
 
   login (): void {
     if ((this.$refs.loginForm as Vue & { validate: () => boolean }).validate()) {
-      Axios.post('/user/login',
+      Axios.post('/login',
         {
-          name: this.userName,
-          password: this.password
+          nameOrEmail: this.nameOrEmail,
+          password: this.password,
+          rememberMe: this.rememberMe
         }).then((response: any) => {
-        if (response.data.code === 200) {
+        console.log('response.status: ' + response.status)
+        if (response.status === 200 && response.data.code === 200) {
           console.log('login success')
           this.$store.commit('login')
           console.log('login status: ' + this.$store.state.login)

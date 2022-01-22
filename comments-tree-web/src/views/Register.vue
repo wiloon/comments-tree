@@ -88,20 +88,12 @@ import Axios from 'axios'
   components: {}
 })
 export default class Register extends Vue {
-  showCorpWechatLogin = true
   snackbar = false
   snackbarColor = 'success'
   snackbarText = ''
-  show1 = true
   dialog = true
   valid = true
-  tab = 0
-  multiLine = true
-  text = 'I\'m a multi-line snackbar.'
-  options = {
-    isLoggingIn: true,
-    shouldStayLoggedIn: true
-  }
+  text = ''
 
   userName = ''
   password = ''
