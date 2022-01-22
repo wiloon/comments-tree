@@ -31,27 +31,29 @@
 <script lang="ts">
 import Vue from 'vue'
 import Axios from 'axios'
+import { sessionCheck } from '@/api/session'
 
 export default Vue.extend({
   name: 'App',
 
   data: () => ({}),
   methods: {
+
+    // 登录
     login: function () {
       console.log('login')
       this.$router.push({ path: '/login' })
     },
+
+    // 注册
     register: function () {
       this.$router.push({ path: '/register' })
     },
+
+    // 退出
     logout: function () {
       Axios.post('/logout',
         {}).then((response: any) => {
-        console.log('logout response.status: ' + response.status)
-        console.log('logout response.request.responseURL: ' + response.request.responseURL)
-        console.log('logout response data: ' + response.data)
-        console.log('logout response data token: ' + response.data.token)
-        console.log('logout response data code: ' + response.data.code)
         if (response.status === 200) {
           this.$store.commit('logout')
           console.log('login status: ' + this.$store.state.login)
@@ -61,24 +63,7 @@ export default Vue.extend({
     }
   },
   mounted: function () {
-    console.log('app mounted')
-    Axios.get('/session',
-      {
-        headers: {},
-        params: {}
-      }).then(
-      response => {
-        console.log('session response: ' + response)
-        console.log('session response data: ' + response.data)
-        console.log('session response data code: ' + response.data.code)
-        if (response.data.code === 200) {
-          this.$store.commit('login')
-          this.$store.commit('updateUserInfo', { info: response.data.data.name + ' (' + response.data.data.email + ')' })
-        } else {
-          this.$store.commit('logout')
-        }
-      }
-    )
+    sessionCheck()
   },
   computed: {
     userInfo () {

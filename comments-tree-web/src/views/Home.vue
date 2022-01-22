@@ -65,7 +65,13 @@
         item-children="reply"
       >
         <template v-slot:label="{ item }">
-          <Comment :content="item.content" :commentId="item.id" v-on:comment-reply="reply"></Comment>
+          <Comment
+            :content="item.content"
+            :commentId="item.id"
+            :userName="item.userName"
+            :updateTime="item.updateTime"
+            v-on:comment-reply="reply"
+          ></Comment>
         </template>
       </v-treeview>
     </v-row>
@@ -77,6 +83,7 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import Axios from 'axios'
 import Comment from '@/components/Comment.vue'
+import { sessionCheck } from '@/api/session'
 
 @Component({
   components: { Comment }
@@ -96,6 +103,7 @@ export default class Home extends Vue {
   }
 
   newComment (): void {
+    this.replyCommentId = 0
     this.dialog = true
     this.commentLabel = '留言'
   }
@@ -154,6 +162,7 @@ export default class Home extends Vue {
 
   mounted (): void {
     this.loadCommentsTree()
+    sessionCheck()
   }
 }
 </script>

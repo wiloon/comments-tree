@@ -5,6 +5,9 @@
         #{{ commentId }}: {{ content }}
       </v-col>
       <v-col>
+        {{ userName }} - {{ updateTime }}
+      </v-col>
+      <v-col>
         <v-btn color="primary" @click="reply" v-if="this.$store.state.login">
           评论
         </v-btn>
@@ -18,7 +21,7 @@ import Vue from 'vue'
 
 export default Vue.extend({
   name: 'Comment',
-  props: ['content', 'commentId'],
+  props: ['content', 'commentId', 'userName', 'updateTime'],
   data: () => ({
     dialog: false,
     newMsg: ''

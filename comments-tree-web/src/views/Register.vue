@@ -101,19 +101,19 @@ export default class Register extends Vue {
   isUserLogin = false
   userNameRule = [
     (v: string) => !!v || '请输入用户名',
-    (v: string) => /^[a-zA-Z0-9._-]{5,20}$/.test(v) || '无效的用户名'
+    (v: string) => /^[a-zA-Z0-9._-]{5,20}$/.test(v) || '用户名长度5~20字符'
   ]
 
   emailRule = [
     (v: string) => !!v || '请输入邮箱',
-    (v: string) => /^[0-9a-zA-Z_.-]+[@][0-9a-zA-Z_.-]+([.][a-zA-Z]+){1,2}$/.test(v) || '无效的邮箱'
+    (v: string) => /^[0-9a-zA-Z_.-]+[@][0-9a-zA-Z_.-]+([.][a-zA-Z]+){1,2}$/.test(v) || '无效的邮箱地址'
   ]
 
   passwordRule = {
     required: (value: string) => !!value || '请输入密码',
     min: (v: string) => (v && v.length >= 8) || '密码长度至少8位',
     max: (v: string) => (v && v.length <= 20) || '密码长度少于20位',
-    complexity: (v: string) => /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d)(?=.*?[!@#$%^&*()\-_=+;])[a-zA-Z\d!@#$%^&*()\-_=+;]*$/.test(v) || '密码复杂度太低,至少包含一个大写、一个小写、一个数字、一个特殊符号(!@#$%^&*()-_=+;)'
+    complexity: (v: string) => /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d)(?=.*?[!@#$%^&*()\-_=+;])[a-zA-Z\d!@#$%^&*()\-_=+;]*$/.test(v) || '密码复杂度太低，至少包含一个大写，一个小写，一个数字，一个特殊符号 (!@#$%^&*()-_=+;)'
   }
 
   // user register

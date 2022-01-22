@@ -34,7 +34,7 @@ public class DefaultAuthenticationSuccessHandler implements AuthenticationSucces
 
         response.setContentType("text/json;charset=UTF-8");
         User user = commentsTreeUserDetails.getUser();
-        response.getWriter().println(JSON.toJSONString(CommonResult.success(user)));
+        response.getWriter().println(JSON.toJSONString(CommonResult.success("登录成功")));
         response.setStatus(HttpServletResponse.SC_OK);
         response.flushBuffer();
     }

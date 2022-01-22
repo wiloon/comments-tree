@@ -91,7 +91,7 @@ export default class Login extends Vue {
   password = ''
   userNameRule = [
     (v: string) => !!v || '请输入用户名',
-    (v: string) => /^[a-zA-Z0-9@._-]{4,16}$/.test(v) || '无效的用户名'
+    (v: string) => /^[a-zA-Z0-9@._-]{5,}$/.test(v) || '无效的用户名'
   ]
 
   passwordRule = {
@@ -110,33 +110,6 @@ export default class Login extends Vue {
         if (response.status === 200 && response.data.code === 200) {
           console.log('login success')
           this.$store.commit('login')
-          console.log('login status: ' + this.$store.state.login)
-          this.$store.commit('updateUserInfo', { info: response.data.data.name + ' (' + response.data.data.email + ')' })
-          this.$router.push({ name: 'Home' })
-        } else {
-          this.snackbarColor = 'error'
-          this.snackbarText = response.data.message
-          this.snackbar = true
-        }
-      })
-    } else {
-      console.log('validate failed')
-    }
-  }
-
-  loginbak (): void {
-    if ((this.$refs.loginForm as Vue & { validate: () => boolean }).validate()) {
-      Axios.post('/login',
-        {
-          nameOrEmail: this.nameOrEmail,
-          password: this.password,
-          rememberMe: this.rememberMe
-        }).then((response: any) => {
-        console.log('response.status: ' + response.status)
-        if (response.status === 200 && response.data.code === 200) {
-          console.log('login success')
-          this.$store.commit('login')
-          console.log('login status: ' + this.$store.state.login)
           this.$router.push({ name: 'Home' })
         } else {
           this.snackbarColor = 'error'

@@ -12,7 +12,7 @@ public class CommentRowMapper implements RowMapper<Comment> {
         comment.setParentId(rs.getInt("parent_id"));
         comment.setId(rs.getInt("id"));
         comment.setContent(rs.getString("content"));
-        comment.setUserId(rs.getString("user_id"));
+        comment.setUserName(rs.getString("user_name"));
         comment.setCreateTime(rs.getDate("create_time"));
         comment.setUpdateTime(rs.getDate("update_time"));
 

@@ -1,5 +1,8 @@
 package com.wiloon.comments.comment;
 
+import com.alibaba.fastjson.annotation.JSONField;
+
+import java.util.Date;
 import java.util.TreeSet;
 
 public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
@@ -38,7 +41,7 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
         if (this.getComment().getId().equals(o.getComment().getId())) {
             return 0;
         } else {
-            return this.getComment().getUpdateTime().after(o.getComment().getUpdateTime()) ? 1 : -1;
+            return this.getComment().getUpdateTime().after(o.getComment().getUpdateTime()) ? -1 : 1;
         }
 
     }
@@ -48,16 +51,23 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     }
 
     public int getParentId() {
-        return this.comment==null?-1:this.comment.getParentId();
+        return this.comment == null ? -1 : this.comment.getParentId();
     }
 
     public int getId() {
-        return this.comment==null?0:this.comment.getId();
+        return this.comment == null ? 0 : this.comment.getId();
     }
-    public String getContent(){
-        return this.comment==null?"":this.comment.getContent();
+
+    public String getContent() {
+        return this.comment == null ? "" : this.comment.getContent();
     }
-    public String getUserId() {
-        return this.comment==null?"":this.comment.getUserId();
+
+    public String getUserName() {
+        return this.comment == null ? "" : this.comment.getUserName();
+    }
+
+    @JSONField(format = "yyyy-MM-dd HH:mm:ss")
+    public Date getUpdateTime() {
+        return this.comment == null ? null : this.comment.getUpdateTime();
     }
 }
