@@ -2,7 +2,7 @@
   <v-container>
     <v-row>
       <v-col>
-        <v-btn color="primary" @click="newComment" v-if="this.$store.state.login">
+        <v-btn color="primary" @click="newComment" v-if="!this.$store.state.login">
           留言
         </v-btn>
       </v-col>
@@ -108,6 +108,9 @@ export default Vue.extend({
           console.log('msg save success')
           // to third party activate
           this.loadCommentsTree()
+        } else if (response.data.code === 401) {
+          this.$store.commit('logout')
+          this.$router.push({ name: 'Login' })
         } else {
           console.log('msg save failed')
         }

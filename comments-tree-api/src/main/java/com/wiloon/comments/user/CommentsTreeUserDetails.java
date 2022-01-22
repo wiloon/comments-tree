@@ -11,10 +11,12 @@ import java.util.List;
 public class CommentsTreeUserDetails implements UserDetails {
     String name;
     String password;
+    private User user;
 
     public CommentsTreeUserDetails(User user) {
         this.name = user.getName();
         this.password = user.getPassword();
+        this.user = user;
     }
 
     @Override
@@ -22,6 +24,10 @@ public class CommentsTreeUserDetails implements UserDetails {
         List<GrantedAuthority> list = new ArrayList<>();
         list.add(new SimpleGrantedAuthority("User"));
         return list;
+    }
+
+    public String getUserId() {
+        return this.user.getId();
     }
 
     @Override
@@ -53,4 +59,5 @@ public class CommentsTreeUserDetails implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
 }

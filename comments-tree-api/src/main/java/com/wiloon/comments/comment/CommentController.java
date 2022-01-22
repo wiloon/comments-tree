@@ -34,11 +34,10 @@ public class CommentController {
     @RequestMapping(value = "/comment", method = RequestMethod.POST)
     @ResponseBody
     public String newComment(@RequestBody JSONObject jsonParam, HttpSession session) {
-        logger.info("messageSave params: {}", jsonParam.toStringPretty());
-        String UserId = (String) session.getAttribute("userId");
-
+        String userId = (String) session.getAttribute("userId");
+        logger.info("new comment params: {}, user id: {}", jsonParam.toStringPretty(), userId);
         try {
-            int id = commentService.newComment(jsonParam.getStr("content"), UserId, jsonParam.getInt("parentId"));
+            int id = commentService.newComment(jsonParam.getStr("content"), userId, jsonParam.getInt("parentId"));
             logger.info("new comment created, id: {}", id);
             return JSON.toJSONString(CommonResult.success("msg save"));
         } catch (Exception e) {

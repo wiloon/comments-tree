@@ -25,6 +25,7 @@
                     <v-checkbox
                       v-model="rememberMe"
                       label="记住我"
+                      data-cy="remember-me"
                     ></v-checkbox>
                   </v-col>
 
@@ -99,6 +100,30 @@ export default class Login extends Vue {
   }
 
   login (): void {
+    if ((this.$refs.loginForm as Vue & { validate: () => boolean }).validate()) {
+      const data = new FormData()
+      data.append('nameOrEmail', this.nameOrEmail)
+      data.append('password', this.password)
+      data.append('rememberMe', String(this.rememberMe))
+      Axios.post('/session', data).then((response: any) => {
+        console.log('response.status: ' + response.status)
+        if (response.status === 200 && response.data.code === 200) {
+          console.log('login success')
+          this.$store.commit('login')
+          console.log('login status: ' + this.$store.state.login)
+          this.$router.push({ name: 'Home' })
+        } else {
+          this.snackbarColor = 'error'
+          this.snackbarText = response.data.message
+          this.snackbar = true
+        }
+      })
+    } else {
+      console.log('validate failed')
+    }
+  }
+
+  loginbak (): void {
     if ((this.$refs.loginForm as Vue & { validate: () => boolean }).validate()) {
       Axios.post('/login',
         {
