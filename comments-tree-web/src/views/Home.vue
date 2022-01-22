@@ -9,41 +9,48 @@
     </v-row>
     <v-row class="text-center">
       <v-col cols="12">
+        <!-- 留言 dialog -->
         <v-dialog
           v-model="dialog"
           persistent
           max-width="290"
         >
-          <v-card>
-            <v-card-title class="text-h5">
-              留言
-            </v-card-title>
-            <v-textarea
-              label="留言"
-              auto-grow
-              outlined
-              rows="10"
-              row-height="10"
-              v-model="newMsg"
-            ></v-textarea>
-            <v-card-actions>
-              <v-spacer></v-spacer>
-              <v-btn
-                color="green darken-1"
-                text
-                @click="dialog = false"
-              >
-                取消
-              </v-btn>
-              <v-btn
-                color="green darken-1"
-                text
-                v-on:click="saveMsg"
-              >
-                保存
-              </v-btn>
-            </v-card-actions>
-          </v-card>
+          <v-form ref="commentForm" v-model="commentsFormValid" lazy-validation>
+            <v-card>
+              <v-card-title class="text-h5">
+                留言
+              </v-card-title>
+              <!-- 留言 text -->
+              <v-textarea
+                label="留言"
+                auto-grow
+                outlined
+                rows="10"
+                row-height="10"
+                v-model="newMsg"
+                :counter="200"
+                :rules="[commentRule.required, commentRule.min, commentRule.max]"
+              ></v-textarea>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  color="green darken-1"
+                  text
+                  @click="dialog = false"
+                >
+                  取消
+                </v-btn>
+                <v-btn
+                  color="green darken-1"
+                  text
+                  v-on:click="saveMsg"
+                  :disabled="!commentsFormValid"
+                >
+                  保存
+                </v-btn>
+              </v-card-actions>
+            </v-card>
+          </v-form>
         </v-dialog>
       </v-col>
     </v-row>
@@ -69,32 +76,52 @@
 
 <script lang="ts">
 import Vue from 'vue'
+import Component from 'vue-class-component'
 import Axios from 'axios'
 import Comment from '@/components/Comment.vue'
 
-export default Vue.extend({
-  name: 'Home',
-  components: {
-    Comment
-  },
-  data: () => ({
-    dialog: false,
-    newMsg: '',
-    items: [],
-    replyCommentId: 0,
-    nodeOpen: []
-  }),
-  methods: {
-    newComment: function () {
-      this.dialog = true
-    },
-    reply: function (commentId: number) {
-      console.log('reply to: ' + commentId)
-      this.replyCommentId = commentId
-      this.dialog = true
-    },
-    saveMsg: function () {
-      console.log('saveMsg')
+@Component({
+  components: { Comment }
+})
+export default class Home extends Vue {
+  dialog = false
+  newMsg = ''
+  items = []
+  replyCommentId = 0
+  nodeOpen = []
+  commentsFormValid = true
+  commentRule = {
+    required: (value: string) => !!value || '请输入留言',
+    min: (v: string) => (v && v.length >= 3) || '留言长度至少3个字',
+    max: (v: string) => (v && v.length <= 200) || '留言长度至多200个字'
+  }
+
+  newComment (): void {
+    this.dialog = true
+  }
+
+  reply (commentId: number) {
+    console.log('reply to: ' + commentId)
+    this.replyCommentId = commentId
+    this.dialog = true
+  }
+
+  loadCommentsTree (): void {
+    console.log('home mounted')
+    Axios.get('/comments',
+      {
+        headers: {},
+        params: {}
+      }).then(
+      response => {
+        this.items = response.data.data.reply
+      }
+    )
+  }
+
+  saveMsg (): void {
+    console.log('saveMsg')
+    if ((this.$refs.commentForm as Vue & { validate: () => boolean }).validate()) {
       this.dialog = false
       console.log(this.newMsg)
 
@@ -119,22 +146,13 @@ export default Vue.extend({
         }
         this.newMsg = ''
       })
-    },
-    loadCommentsTree: function () {
-      console.log('home mounted')
-      Axios.get('/comments',
-        {
-          headers: {},
-          params: {}
-        }).then(
-        response => {
-          this.items = response.data.data.reply
-        }
-      )
+    } else {
+      console.log('comments validate failed')
     }
-  },
-  mounted: function () {
+  }
+
+  mounted (): void {
     this.loadCommentsTree()
   }
-})
+}
 </script>

@@ -35,9 +35,6 @@ public class UserService implements UserDetailsService {
         return bcryptPasswordEncoder.encode(password);
     }
 
-    public boolean isPasswordMatch(String password, String hash) {
-        return bcryptPasswordEncoder.matches(password, hash);
-    }
 
     public boolean isUserRegistered(String name, String email) {
         String sql = "SELECT count(*) FROM users WHERE NAME=? OR email=?";

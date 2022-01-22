@@ -3,11 +3,11 @@ package com.wiloon.comments.user;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class User {
-    private static final BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
+    public static final String SESSION_USER_ID_KEY = "userId";
     private String id;
     private String name;
     private String email;
-    private String password;
+    private transient String password;
 
     public User(String name) {
         this.name = name;
@@ -50,7 +50,4 @@ public class User {
         return String.format("User, id: %s, name: %s, password: %s", this.id, this.name, this.password);
     }
 
-    public boolean isPasswordMatch(String password) {
-        return bcryptPasswordEncoder.matches(password, this.getPassword());
-    }
 }
