@@ -14,22 +14,20 @@
           v-model="dialog"
           persistent
           max-width="290"
+          class="comment-dialog"
         >
           <v-form ref="commentForm" v-model="commentsFormValid" lazy-validation>
             <v-card>
-              <v-card-title class="text-h5">
-                留言
-              </v-card-title>
               <!-- 留言 text -->
-              <v-textarea
-                label="留言"
-                auto-grow
-                outlined
-                rows="10"
-                row-height="10"
-                v-model="newMsg"
-                :counter="200"
-                :rules="[commentRule.required, commentRule.min, commentRule.max]"
+              <v-textarea class="comment-content"
+                          :label="commentLabel"
+                          auto-grow
+                          outlined
+                          rows="10"
+                          row-height="10"
+                          v-model="newMsg"
+                          :counter="200"
+                          :rules="[commentRule.required, commentRule.min, commentRule.max]"
               ></v-textarea>
               <v-card-actions>
                 <v-spacer></v-spacer>
@@ -90,6 +88,7 @@ export default class Home extends Vue {
   replyCommentId = 0
   nodeOpen = []
   commentsFormValid = true
+  commentLabel = '留言'
   commentRule = {
     required: (value: string) => !!value || '请输入留言',
     min: (v: string) => (v && v.length >= 3) || '留言长度至少3个字',
@@ -98,12 +97,14 @@ export default class Home extends Vue {
 
   newComment (): void {
     this.dialog = true
+    this.commentLabel = '留言'
   }
 
   reply (commentId: number) {
     console.log('reply to: ' + commentId)
     this.replyCommentId = commentId
     this.dialog = true
+    this.commentLabel = '评论'
   }
 
   loadCommentsTree (): void {
@@ -156,3 +157,11 @@ export default class Home extends Vue {
   }
 }
 </script>
+
+<style scoped lang="stylus">
+.comment-content
+  margin: 10px
+
+.comment-dialog
+  padding-top; 10px
+</style>
