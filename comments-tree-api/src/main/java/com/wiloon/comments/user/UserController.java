@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpSession;
 
+/**
+ * 用户 controller
+ */
 @Controller
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
@@ -59,6 +62,7 @@ public class UserController {
 
     /**
      * 检查session是否有效并返回用户信息, session过期时会被 spring security 拦截掉 返回 状态码401
+     *
      * @param session 用户 session
      * @return 用户信息
      */
@@ -66,8 +70,15 @@ public class UserController {
     @ResponseBody
     public String sessionCheck(HttpSession session) {
         logger.info("session check");
-        String userId = (String) session.getAttribute(User.SESSION_USER_ID_KEY);
-        User user = userService.getUserById(userId);
-        return JSON.toJSONString(CommonResult.success(user));
+        logger.info("session: {}", session);
+        logger.info("userId: {}", session.getAttribute(User.SESSION_USER_ID_KEY));
+        Object userId = session.getAttribute(User.SESSION_USER_ID_KEY);
+        if (userId == null) {
+            return JSON.toJSONString(CommonResult.unauthorized("用户未登录"));
+        } else {
+            User user = userService.getUserById((String) userId);
+            return JSON.toJSONString(CommonResult.success(user));
+        }
+
     }
 }

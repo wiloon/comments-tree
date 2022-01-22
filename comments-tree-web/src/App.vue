@@ -17,14 +17,47 @@
       >
         {{ userInfo }}
       </v-chip>
-      <v-btn v-on:click="login" class="navBarItem" v-if="!this.$store.state.login" data-cy="login-dialog">登录</v-btn>
-      <v-btn v-on:click="register" class="navBarItem" v-if="!this.$store.state.login">注册</v-btn>
-      <v-btn v-on:click="logout" class="navBarItem" v-if="this.$store.state.login">退出</v-btn>
+      <v-btn data-cy="login-dialog" v-on:click="login" class="navBarItem" v-if="!this.$store.state.login">登录</v-btn>
+      <v-btn data-cy="register-dialog" v-on:click="register" class="navBarItem" v-if="!this.$store.state.login">注册
+      </v-btn>
+      <v-btn data-cy="logout-dialog" v-on:click="logout" class="navBarItem" v-if="this.$store.state.login">退出</v-btn>
     </v-app-bar>
 
     <v-main>
       <router-view/>
     </v-main>
+    <v-row justify="center">
+      <v-dialog
+        v-model="dialog"
+        persistent
+        max-width="290"
+      >
+        <v-card>
+          <v-card-title class="text-h5">
+            用户未登录
+          </v-card-title>
+          <v-card-text>用户未登录或会话过期，请重新登录。
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="green darken-1"
+              text
+              @click="dialog = false"
+            >
+              取消
+            </v-btn>
+            <v-btn
+              color="green darken-1"
+              text
+              @click="agree"
+            >
+              确认
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </v-row>
   </v-app>
 </template>
 
@@ -32,11 +65,14 @@
 import Vue from 'vue'
 import Axios from 'axios'
 import { sessionCheck } from '@/api/session'
+import router from '@/router'
 
 export default Vue.extend({
   name: 'App',
 
-  data: () => ({}),
+  data: () => ({
+    dialog: false
+  }),
   methods: {
 
     // 登录
@@ -60,11 +96,21 @@ export default Vue.extend({
           window.location.href = response.request.responseURL
         }
       })
+    },
+    agree: function () {
+      this.dialog = false
+      router.push('/login')
     }
   },
   mounted: function () {
-    sessionCheck()
+    // sessionCheck()
   },
+  // watch: {
+  //   '$store.state.count': function (newVal) {
+  //     console.log('count: ' + newVal)
+  //     this.dialog = true
+  //   }
+  // },
   computed: {
     userInfo () {
       return this.$store.state.userInfo

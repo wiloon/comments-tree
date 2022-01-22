@@ -8,7 +8,9 @@ export function sessionCheck (): void {
       params: {}
     }).then(
     response => {
-      if (response.data.code === 200) {
+      const code = response.data.code
+      console.log('session check response code: ' + code)
+      if (code === 200) {
         store.commit('login')
         store.commit('updateUserInfo', { info: response.data.data.name + ' (' + response.data.data.email + ')' })
       } else {

@@ -123,6 +123,10 @@ export default class Home extends Vue {
         params: {}
       }).then(
       response => {
+        if (response.data.data === undefined) {
+          console.log('/comments, invalid response')
+          return
+        }
         this.items = response.data.data.reply
       }
     )

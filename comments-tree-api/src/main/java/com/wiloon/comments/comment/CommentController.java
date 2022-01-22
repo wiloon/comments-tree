@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpSession;
 
+/**
+ * 留言/评论 controller
+ */
 @Controller
 public class CommentController {
     private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
@@ -23,7 +26,7 @@ public class CommentController {
     CommentService commentService;
 
     /**
-     * get all comments
+     * 查询留言列表
      *
      * @return comments list
      */

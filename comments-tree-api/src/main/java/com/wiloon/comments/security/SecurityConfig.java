@@ -50,6 +50,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity.authorizeRequests();
         // white list
         registry.antMatchers(HttpMethod.POST, "/session").permitAll(); // 用户登录
+        // registry.antMatchers(HttpMethod.GET, "/session").permitAll();
         registry.antMatchers("/ping").permitAll();
         registry.antMatchers("/comments").permitAll();
         registry.antMatchers("/user").permitAll();
@@ -93,6 +94,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .loginProcessingUrl("/session")
                 .usernameParameter("nameOrEmail")
                 .successHandler(loginAuthenticationSuccessHandler())
+                .failureHandler(new AuthenticationFailureHandler(){
+                    @Override
+                    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
+                        String accessControlAllowOrigin = request.getHeader("Access-Control-Allow-Origin");
+                        response.addHeader("Access-Control-Allow-Origin", accessControlAllowOrigin);
+                        response.addHeader("Access-Control-Allow-Credentials", "true");
+                        response.setContentType("text/json;charset=UTF-8");
+                        response.getWriter().println(JSON.toJSONString(CommonResult.failed("登录失败")));
+                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                        response.flushBuffer();
+                    }
+                })
                 .and()
                 // .addFilterAt(loginFilter(), UsernamePasswordAuthenticationFilter.class)
                 // .addFilterAt(rememberMeAuthenticationFilter(), RememberMeAuthenticationFilter.class)

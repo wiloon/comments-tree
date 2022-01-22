@@ -43,13 +43,12 @@
                   <v-spacer></v-spacer>
                   <v-col class="d-flex" cols="12" sm="3" xsm="12" align-end>
                     <v-btn
+                      data-cy="register-btn"
                       x-large
                       block
                       :disabled="!valid"
                       color="primary"
-                      @click="register"
-                      data-cy="login">
-                      注册
+                      @click="register"> 注册
                     </v-btn>
                   </v-col>
                 </v-row>

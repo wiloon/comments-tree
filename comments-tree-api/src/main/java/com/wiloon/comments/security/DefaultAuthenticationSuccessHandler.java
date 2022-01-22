@@ -26,14 +26,10 @@ public class DefaultAuthenticationSuccessHandler implements AuthenticationSucces
         logger.debug("name: {}", authentication.getName());
         CommentsTreeUserDetails commentsTreeUserDetails = (CommentsTreeUserDetails) userService.loadUserByUsername(authentication.getName());
         request.getSession().setAttribute(User.SESSION_USER_ID_KEY, commentsTreeUserDetails.getUserId());
-
         String accessControlAllowOrigin = request.getHeader("Access-Control-Allow-Origin");
-
         response.addHeader("Access-Control-Allow-Origin", accessControlAllowOrigin);
         response.addHeader("Access-Control-Allow-Credentials", "true");
-
         response.setContentType("text/json;charset=UTF-8");
-        User user = commentsTreeUserDetails.getUser();
         response.getWriter().println(JSON.toJSONString(CommonResult.success("登录成功")));
         response.setStatus(HttpServletResponse.SC_OK);
         response.flushBuffer();

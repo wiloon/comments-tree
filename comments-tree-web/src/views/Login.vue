@@ -55,12 +55,11 @@
         :timeout=3000
       >
         {{ snackbarText }}
-
         <template v-slot:action="{ attrs }">
           <v-btn
             text
             v-bind="attrs"
-            @click="snackbar = true"
+            @click="snackbar = false"
           >
             Close
           </v-btn>
