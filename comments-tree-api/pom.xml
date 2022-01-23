@@ -113,9 +113,6 @@
                             <directory>${project.parent.basedir}/comments-tree-web/node_modules</directory>
                         </fileset>
                         <fileset>
-                            <directory>${project.parent.basedir}/comments-tree.db</directory>
-                        </fileset>
-                        <fileset>
                             <directory>${project.parent.basedir}/comments-tree-api/comments-tree.db</directory>
                         </fileset>
                     </filesets>

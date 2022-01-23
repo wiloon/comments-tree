@@ -3,7 +3,6 @@ package com.wiloon.comments;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
 import org.springframework.dao.DataAccessException;
@@ -16,8 +15,6 @@ import org.springframework.web.context.ServletContextAware;
 import javax.servlet.ServletContext;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
-import java.util.Map;
 
 /**
  * init sqlite db

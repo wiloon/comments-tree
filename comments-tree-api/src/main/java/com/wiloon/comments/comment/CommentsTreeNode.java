@@ -5,12 +5,20 @@ import com.alibaba.fastjson.annotation.JSONField;
 import java.util.Date;
 import java.util.TreeSet;
 
+/**
+ * 留言树节点
+ */
 public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     // 留言
     private Comment comment;
     // 此条留言的评论
     private TreeSet<CommentsTreeNode> reply;
 
+    /**
+     * 创建一个新的留言节点
+     * @param comment 留言
+     * @return 树节点
+     */
     public static CommentsTreeNode createNode(Comment comment) {
         CommentsTreeNode node = new CommentsTreeNode();
         node.setComment(comment);
@@ -25,10 +33,10 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
         this.comment = comment;
     }
 
-    public void addNode(Comment comment) {
-
-    }
-
+    /**
+     * 向留言树填充留言的直接评论
+     * @param node 评论节点
+     */
     public void addReply(CommentsTreeNode node) {
         if (reply == null) {
             this.reply = new TreeSet<>();
@@ -36,6 +44,11 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
         reply.add(node);
     }
 
+    /**
+     * 比较同一层的留言顺序按更新日期倒序
+     * @param o 留言
+     * @return 相等: 0, 时间更新: -1, 时间更旧: 1
+     */
     @Override
     public int compareTo(CommentsTreeNode o) {
         if (this.getComment().getId().equals(o.getComment().getId())) {
@@ -46,6 +59,10 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
 
     }
 
+    /**
+     * 获取留言的评论
+     * @return 评论集合
+     */
     public TreeSet<CommentsTreeNode> getReply() {
         return reply;
     }

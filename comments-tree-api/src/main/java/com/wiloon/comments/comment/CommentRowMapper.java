@@ -5,6 +5,9 @@ import org.springframework.jdbc.core.RowMapper;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+/**
+ * Comment Sqlite row mapper
+ */
 public class CommentRowMapper implements RowMapper<Comment> {
     @Override
     public Comment mapRow(ResultSet rs, int rowNum) throws SQLException {
