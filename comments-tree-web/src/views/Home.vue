@@ -42,7 +42,7 @@
                   color="green darken-1"
                   text
                   v-on:click="saveMsg"
-                  :disabled="!commentsFormValid"
+                  :disabled="!commentSaveBtnAvailable"
                 >
                   保存
                 </v-btn>
@@ -95,6 +95,7 @@ export default class Home extends Vue {
   nodeOpen = []
   commentsFormValid = true
   commentLabel = '留言'
+
   commentRule = {
     required: (value: string) => !!value || '请输入留言',
     min: (v: string) => (v && v.length >= 3) || '留言长度至少3个字',
@@ -134,7 +135,6 @@ export default class Home extends Vue {
   saveMsg (): void {
     console.log('saveMsg')
     if ((this.$refs.commentForm as Vue & { validate: () => boolean }).validate()) {
-      this.dialog = false
       console.log(this.newMsg)
 
       Axios.post('/comment',
@@ -142,11 +142,8 @@ export default class Home extends Vue {
           content: this.newMsg,
           parentId: this.replyCommentId
         }).then((response: any) => {
-        console.log('login response: ' + response)
-        console.log('login response data: ' + response.data)
-        console.log('login response data token: ' + response.data.token)
-        console.log('login response data code: ' + response.data.code)
         if (response.data.code === 200) {
+          this.dialog = false
           console.log('msg save success')
           // to third party activate
           this.loadCommentsTree()
@@ -163,8 +160,7 @@ export default class Home extends Vue {
     }
   }
 
-  mounted (): void {
-    this.loadCommentsTree()
+  sessionCheck (): void {
     Axios.get('/session',
       {
         headers: {},
@@ -181,6 +177,15 @@ export default class Home extends Vue {
         }
       }
     )
+  }
+
+  mounted (): void {
+    this.loadCommentsTree()
+    this.sessionCheck()
+  }
+
+  get commentSaveBtnAvailable () {
+    return this.commentsFormValid
   }
 }
 </script>

@@ -1,9 +1,5 @@
 package com.wiloon.comments.security;
 
-import com.alibaba.fastjson.JSON;
-import com.wiloon.comments.common.CommonResult;
-import com.wiloon.comments.user.CommentsTreeUserDetails;
-import com.wiloon.comments.user.User;
 import com.wiloon.comments.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -17,25 +13,20 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import java.io.IOException;
+
 
 @Configuration
 @EnableWebSecurity
@@ -58,9 +49,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         registry.antMatchers("/js/*").permitAll();
 
         registry.antMatchers(HttpMethod.POST, "/session").permitAll(); // 用户登录
-        registry.antMatchers(HttpMethod.GET, "/session").permitAll(); // session 检查
+        // registry.antMatchers(HttpMethod.GET, "/session").permitAll(); // session 检查
         registry.antMatchers("/comments").permitAll();  // 查询 comments 列表
-        registry.antMatchers("/user").permitAll();
+        registry.antMatchers("/user").permitAll(); // 用户 注册
 
         // 跨域的 OPTIONS 请求
         registry.antMatchers(HttpMethod.OPTIONS).permitAll();
@@ -68,19 +59,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // logout
         registry.and().logout()
                 .logoutUrl("/logout")
-                .logoutSuccessUrl("http://localhost:8080/")
-                .logoutSuccessHandler(new LogoutSuccessHandler(){
-                    @Override
-                    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-                        String accessControlAllowOrigin = request.getHeader("Access-Control-Allow-Origin");
-                        response.addHeader("Access-Control-Allow-Origin", accessControlAllowOrigin);
-                        response.addHeader("Access-Control-Allow-Credentials", "true");
-                        response.setContentType("text/json;charset=UTF-8");
-                        response.getWriter().println(JSON.toJSONString(CommonResult.success("退出成功")));
-                        response.setStatus(HttpServletResponse.SC_OK);
-                        response.flushBuffer();
-                    }
-                })
+                .logoutSuccessHandler(logoutSuccessHandler()) // 登出成功handler
                 .deleteCookies("JSESSIONID")
                 .and().authorizeRequests()
                 .anyRequest()
@@ -99,37 +78,31 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .rememberMeParameter("rememberMe")
                 .tokenRepository(persistentTokenRepository())
                 .tokenValiditySeconds(30 * 24 * 60 * 60)
-                .userDetailsService(userDetailsService()).authenticationSuccessHandler(new AuthenticationSuccessHandler(){
-
-                    @Override
-                    public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
-                        CommentsTreeUserDetails user = (CommentsTreeUserDetails) userService.loadUserByUsername(authentication.getName());
-                        request.getSession().setAttribute(User.SESSION_USER_ID_KEY, user.getUserId());
-
-                    }
-                })
+                .userDetailsService(userDetailsService())
+                .authenticationSuccessHandler(rememberSuccessHandler()) // remember me auth success handler
                 // form login
                 .and().formLogin()
                 .loginProcessingUrl("/session")
                 .usernameParameter("nameOrEmail")
-                .successHandler(loginAuthenticationSuccessHandler())
-                .failureHandler(new AuthenticationFailureHandler(){
-                    @Override
-                    public void onAuthenticationFailure(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
-                        String accessControlAllowOrigin = request.getHeader("Access-Control-Allow-Origin");
-                        response.addHeader("Access-Control-Allow-Origin", accessControlAllowOrigin);
-                        response.addHeader("Access-Control-Allow-Credentials", "true");
-                        response.setContentType("text/json;charset=UTF-8");
-                        response.getWriter().println(JSON.toJSONString(CommonResult.failed("登录失败")));
-                        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                        response.flushBuffer();
-                    }
-                })
-                .and()
-                // .addFilterAt(loginFilter(), UsernamePasswordAuthenticationFilter.class)
-                // .addFilterAt(rememberMeAuthenticationFilter(), RememberMeAuthenticationFilter.class)
-        ;
-        // httpSecurity.addFilterAt(UsernamePasswordAuthenticationFilter.class);
+                .successHandler(loginAuthenticationSuccessHandler()) // form login auth success handler
+                .failureHandler(formLoginFailedHandler()) // form login auth failed handler
+                .and();
+
+    }
+
+    @Bean
+    public AuthenticationFailureHandler formLoginFailedHandler() {
+        return new FormLoginAuthFailurHandler();
+    }
+
+    @Bean
+    public AuthenticationSuccessHandler rememberSuccessHandler() {
+        return new DefaultRememberMeSuccessHandler();
+    }
+
+    @Bean
+    public LogoutSuccessHandler logoutSuccessHandler() {
+        return new DefaultLogoutSuccessHandler();
     }
 
     @Bean
@@ -142,26 +115,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     public AuthenticationSuccessHandler loginAuthenticationSuccessHandler() {
         return new DefaultAuthenticationSuccessHandler();
     }
-
-//    @Bean
-//    public LoginFilter loginFilter() {
-//
-//        LoginFilter loginFilter = new LoginFilter();
-//        loginFilter.setAuthenticationSuccessHandler(new DefaultAuthenticationSuccessHandler());
-//        loginFilter.setAuthenticationFailureHandler((request, response, exception) -> {
-//            String accessControlAllowOrigin = request.getHeader("Access-Control-Allow-Origin");
-//
-//            response.addHeader("Access-Control-Allow-Origin", accessControlAllowOrigin);
-//            response.addHeader("Access-Control-Allow-Credentials", "true");
-//
-//            response.setContentType("text/json;charset=UTF-8");
-//            response.getWriter().println(JSON.toJSONString(CommonResult.failed("登录失败")));
-//            response.setStatus(HttpServletResponse.SC_OK);
-//            response.flushBuffer();
-//        });
-//        loginFilter.setRememberMeServices(rememberMeServices());
-//        return loginFilter;
-//    }
 
     @Bean
     public UserService wjcUserDetailsService() {

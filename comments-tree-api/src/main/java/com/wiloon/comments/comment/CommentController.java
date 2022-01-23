@@ -33,9 +33,10 @@ public class CommentController {
     @RequestMapping(value = "/comments", method = RequestMethod.GET)
     @ResponseBody
     public String comments() {
+        logger.info("get comment list");
         CommentsTreeNode commentsTreeNode = commentService.getSortedComments();
         String comments = JSON.toJSONString(CommonResult.success(commentsTreeNode));
-        logger.debug("comments: {}", comments);
+        logger.debug("comment list: {}", comments);
         return comments;
     }
 
