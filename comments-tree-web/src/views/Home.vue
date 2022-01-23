@@ -83,7 +83,6 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import Axios from 'axios'
 import Comment from '@/components/Comment.vue'
-import { sessionCheck } from '@/api/session'
 
 @Component({
   components: { Comment }
@@ -166,7 +165,22 @@ export default class Home extends Vue {
 
   mounted (): void {
     this.loadCommentsTree()
-    sessionCheck()
+    Axios.get('/session',
+      {
+        headers: {},
+        params: {}
+      }).then(
+      response => {
+        const code = response.data.code
+        console.log('session check response code: ' + code)
+        if (code === 200) {
+          this.$store.commit('login')
+          this.$store.commit('updateUserInfo', { info: response.data.data.name + ' (' + response.data.data.email + ')' })
+        } else {
+          this.$store.commit('logout')
+        }
+      }
+    )
   }
 }
 </script>

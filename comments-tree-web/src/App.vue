@@ -27,36 +27,29 @@
       <router-view/>
     </v-main>
     <v-row justify="center">
-      <v-dialog
-        v-model="dialog"
-        persistent
-        max-width="290"
+      <v-snackbar
+        v-model="snackbar"
       >
-        <v-card>
-          <v-card-title class="text-h5">
-            用户未登录
-          </v-card-title>
-          <v-card-text>用户未登录或会话过期，请重新登录。
-          </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn
-              color="green darken-1"
-              text
-              @click="dialog = false"
-            >
-              取消
-            </v-btn>
-            <v-btn
-              color="green darken-1"
-              text
-              @click="agree"
-            >
-              确认
-            </v-btn>
-          </v-card-actions>
-        </v-card>
-      </v-dialog>
+        {{ snackbarText }}
+        <template v-slot:action="{ attrs }">
+          <v-btn
+            color="pink"
+            text
+            v-bind="attrs"
+            @click="agree"
+            v-if="toLogin"
+          >
+            确认
+          </v-btn>
+          <v-btn
+            text
+            v-bind="attrs"
+            @click="snackbar = false"
+          >
+            关闭
+          </v-btn>
+        </template>
+      </v-snackbar>
     </v-row>
   </v-app>
 </template>
@@ -64,17 +57,17 @@
 <script lang="ts">
 import Vue from 'vue'
 import Axios from 'axios'
-import { sessionCheck } from '@/api/session'
 import router from '@/router'
 
 export default Vue.extend({
   name: 'App',
 
   data: () => ({
-    dialog: false
+    snackbar: false,
+    snackbarText: '',
+    toLogin: false
   }),
   methods: {
-
     // 登录
     login: function () {
       console.log('login')
@@ -90,27 +83,32 @@ export default Vue.extend({
     logout: function () {
       Axios.post('/logout',
         {}).then((response: any) => {
-        if (response.status === 200) {
+        if (response.status === 200 && response.data.code === 200) {
           this.$store.commit('logout')
           console.log('login status: ' + this.$store.state.login)
-          window.location.href = response.request.responseURL
+          // window.location.href = response.request.responseURL
         }
       })
     },
     agree: function () {
-      this.dialog = false
+      this.snackbar = false
       router.push('/login')
     }
   },
-  mounted: function () {
-    // sessionCheck()
+  watch: {
+    '$store.state.count': function (newVal) {
+      console.log('count: ' + newVal)
+      console.log('show snap, this path: ' + this.$router.currentRoute.path)
+      if (this.$router.currentRoute.path === '/login') {
+        this.snackbarText = '登录失败，用户名或密码错错误。'
+        this.toLogin = false
+      } else {
+        this.snackbarText = '用户未登录或会话过期，请重新登录。'
+        this.toLogin = true
+      }
+      this.snackbar = true
+    }
   },
-  // watch: {
-  //   '$store.state.count': function (newVal) {
-  //     console.log('count: ' + newVal)
-  //     this.dialog = true
-  //   }
-  // },
   computed: {
     userInfo () {
       return this.$store.state.userInfo

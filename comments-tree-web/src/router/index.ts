@@ -40,7 +40,16 @@ axios.interceptors.response.use(function (response) {
 }, function (error) {
   console.log('error.response.status: ' + error.response.status)
   if (error.response.status === 401) {
-    // store.commit('increment')
+    const url = error.response.config.url
+    const method = error.response.config.method
+    console.log('response method: ' + method)
+    console.log('response url: ' + url)
+    if (url === '/session' && method === 'get') {
+      console.log('session get 401')
+    } else {
+      store.commit('increment')
+    }
+
     return Promise.reject(error)
   }
   return Promise.reject(error)

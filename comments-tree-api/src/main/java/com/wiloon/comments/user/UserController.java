@@ -23,13 +23,6 @@ public class UserController {
     @Autowired
     UserService userService;
 
-    @RequestMapping(value = "/ping", method = RequestMethod.GET)
-    @ResponseBody
-    public String ping() {
-        logger.info("ping");
-        return "pong";
-    }
-
     /**
      * 用户注册
      */

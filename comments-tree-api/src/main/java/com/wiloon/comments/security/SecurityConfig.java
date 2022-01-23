@@ -26,6 +26,7 @@ import org.springframework.security.web.authentication.AuthenticationFailureHand
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.RememberMeServices;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
@@ -50,7 +51,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity.authorizeRequests();
         // white list
         registry.antMatchers(HttpMethod.POST, "/session").permitAll(); // 用户登录
-        // registry.antMatchers(HttpMethod.GET, "/session").permitAll();
+        registry.antMatchers(HttpMethod.GET, "/session").permitAll();
         registry.antMatchers("/ping").permitAll();
         registry.antMatchers("/comments").permitAll();
         registry.antMatchers("/user").permitAll();
@@ -62,6 +63,18 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         registry.and().logout()
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("http://localhost:8080/")
+                .logoutSuccessHandler(new LogoutSuccessHandler(){
+                    @Override
+                    public void onLogoutSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
+                        String accessControlAllowOrigin = request.getHeader("Access-Control-Allow-Origin");
+                        response.addHeader("Access-Control-Allow-Origin", accessControlAllowOrigin);
+                        response.addHeader("Access-Control-Allow-Credentials", "true");
+                        response.setContentType("text/json;charset=UTF-8");
+                        response.getWriter().println(JSON.toJSONString(CommonResult.success("退出成功")));
+                        response.setStatus(HttpServletResponse.SC_OK);
+                        response.flushBuffer();
+                    }
+                })
                 .deleteCookies("JSESSIONID")
                 .and().authorizeRequests()
                 .anyRequest()
