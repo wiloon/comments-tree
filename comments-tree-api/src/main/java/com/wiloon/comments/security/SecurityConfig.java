@@ -50,10 +50,16 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity.authorizeRequests();
         // white list
+        // vue 编译后的静态文件路径
+        registry.antMatchers("/index.html").permitAll();
+        registry.antMatchers("/favicon.ico").permitAll();
+        registry.antMatchers("/css/*").permitAll();
+        registry.antMatchers("/fonts/*").permitAll();
+        registry.antMatchers("/js/*").permitAll();
+
         registry.antMatchers(HttpMethod.POST, "/session").permitAll(); // 用户登录
-        registry.antMatchers(HttpMethod.GET, "/session").permitAll();
-        registry.antMatchers("/ping").permitAll();
-        registry.antMatchers("/comments").permitAll();
+        registry.antMatchers(HttpMethod.GET, "/session").permitAll(); // session 检查
+        registry.antMatchers("/comments").permitAll();  // 查询 comments 列表
         registry.antMatchers("/user").permitAll();
 
         // 跨域的 OPTIONS 请求

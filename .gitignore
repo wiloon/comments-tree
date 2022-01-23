@@ -3,3 +3,6 @@
 **/*.iml
 *.db
 **/node_modules
+**/node
+**/static
+**/dist
