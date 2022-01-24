@@ -8,11 +8,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpSession;
 
 /**
  * 用户 controller
@@ -28,7 +27,7 @@ public class UserController {
      */
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     @ResponseBody
-    public String register(@RequestBody JSONObject jsonParam, HttpSession session) {
+    public String register(@RequestBody JSONObject jsonParam) {
         logger.info("params: {}", jsonParam.toStringPretty());
         String name = jsonParam.getStr("name");
         String email = jsonParam.getStr("email");
@@ -42,7 +41,6 @@ public class UserController {
         }
         User user = userService.getUserById(id);
         setAuthentication(user);
-        session.setAttribute(User.SESSION_USER_ID_KEY, user.getId());
         return JSON.toJSONString(CommonResult.success("注册成功"));
     }
 
@@ -56,22 +54,19 @@ public class UserController {
     /**
      * 检查session是否有效并返回用户信息, session过期时会被 spring security 拦截掉 返回 状态码401
      *
-     * @param session 用户 session
      * @return 用户信息
      */
     @RequestMapping(value = "/session", method = RequestMethod.GET)
     @ResponseBody
-    public String sessionCheck(HttpSession session) {
+    public String sessionCheck() {
         logger.info("session check");
-        logger.info("session: {}", session);
-        logger.info("userId: {}", session.getAttribute(User.SESSION_USER_ID_KEY));
-        Object userId = session.getAttribute(User.SESSION_USER_ID_KEY);
-        if (userId == null) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+        if (authentication == null || authentication.getName() == null) {
             return JSON.toJSONString(CommonResult.unauthorized("用户未登录"));
         } else {
-            User user = userService.getUserById((String) userId);
+            User user = userService.getUserByNameOrEmail(authentication.getName());
             return JSON.toJSONString(CommonResult.success(user));
         }
-
     }
 }

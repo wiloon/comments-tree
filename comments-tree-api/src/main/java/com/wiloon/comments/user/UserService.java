@@ -23,12 +23,15 @@ public class UserService implements UserDetailsService {
     public User getUserByName(String name) {
         return jdbcTemplate.queryForObject("SELECT * FROM users where name=?", new UserRowMapper(), name);
     }
+
     public User getUserByEmail(String email) {
         return jdbcTemplate.queryForObject("SELECT * FROM users where email=?", new UserRowMapper(), email);
     }
+
     public User getUserById(String id) {
         return jdbcTemplate.queryForObject("SELECT * FROM users where id=?", new UserRowMapper(), id);
     }
+
     public String hashPassword(String password) {
         return bcryptPasswordEncoder.encode(password);
     }
@@ -50,12 +53,17 @@ public class UserService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String nameOrEmail) throws UsernameNotFoundException {
         logger.info("loadUserByUsername: {}", nameOrEmail);
+        User user = getUserByNameOrEmail(nameOrEmail);
+        return new CommentsTreeUserDetails(user);
+    }
+
+    public User getUserByNameOrEmail(String nameOrEmail) {
         User user;
         if (Utils.isEmail(nameOrEmail)) {
             user = getUserByEmail(nameOrEmail);
         } else {
             user = getUserByName(nameOrEmail);
         }
-        return new CommentsTreeUserDetails(user);
+        return user;
     }
 }

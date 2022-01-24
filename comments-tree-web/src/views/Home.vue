@@ -95,6 +95,7 @@ export default class Home extends Vue {
   nodeOpen = []
   commentsFormValid = true
   commentLabel = '留言'
+  commentSaving = false
 
   commentRule = {
     required: (value: string) => !!value || '请输入留言',
@@ -103,13 +104,14 @@ export default class Home extends Vue {
   }
 
   newComment (): void {
+    this.commentSaving = false
     this.replyCommentId = 0
     this.dialog = true
     this.commentLabel = '留言'
   }
 
   reply (commentId: number) {
-    console.log('reply to: ' + commentId)
+    this.commentSaving = false
     this.replyCommentId = commentId
     this.dialog = true
     this.commentLabel = '评论'
@@ -135,8 +137,7 @@ export default class Home extends Vue {
   saveMsg (): void {
     console.log('saveMsg')
     if ((this.$refs.commentForm as Vue & { validate: () => boolean }).validate()) {
-      console.log(this.newMsg)
-
+      this.commentSaving = true
       Axios.post('/comment',
         {
           content: this.newMsg,
@@ -160,7 +161,7 @@ export default class Home extends Vue {
     }
   }
 
-  sessionCheck (): void {
+  mounted (): void {
     Axios.get('/session',
       {
         headers: {},
@@ -175,17 +176,13 @@ export default class Home extends Vue {
         } else {
           this.$store.commit('logout')
         }
+        this.loadCommentsTree()
       }
     )
   }
 
-  mounted (): void {
-    this.loadCommentsTree()
-    this.sessionCheck()
-  }
-
   get commentSaveBtnAvailable () {
-    return this.commentsFormValid
+    return this.commentsFormValid && !this.commentSaving
   }
 }
 </script>

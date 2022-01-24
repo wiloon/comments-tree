@@ -125,7 +125,9 @@ export default class Register extends Vue {
           password: this.password
         }).then((response: any) => {
         if (response.data.code === 200) {
-          console.log('register success')
+          this.snackbarColor = 'success'
+          this.snackbarText = response.data.message
+          this.snackbar = true
           this.$store.commit('login')
           this.$router.push({ name: 'Home' })
         } else {

@@ -22,10 +22,13 @@ import org.springframework.security.web.authentication.RememberMeServices;
 
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
+import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
 import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 
+import javax.servlet.Filter;
 import javax.sql.DataSource;
+import java.util.UUID;
 
 
 @Configuration
@@ -79,14 +82,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .tokenRepository(persistentTokenRepository())
                 .tokenValiditySeconds(30 * 24 * 60 * 60)
                 .userDetailsService(userDetailsService())
-                .authenticationSuccessHandler(rememberSuccessHandler()) // remember me auth success handler
                 // form login
                 .and().formLogin()
                 .loginProcessingUrl("/session")
                 .usernameParameter("nameOrEmail")
                 .successHandler(loginAuthenticationSuccessHandler()) // form login auth success handler
                 .failureHandler(formLoginFailedHandler()) // form login auth failed handler
-                .and();
+                ;
+
 
     }
 
@@ -96,29 +99,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     @Bean
-    public AuthenticationSuccessHandler rememberSuccessHandler() {
-        return new DefaultRememberMeSuccessHandler();
-    }
-
-    @Bean
     public LogoutSuccessHandler logoutSuccessHandler() {
         return new DefaultLogoutSuccessHandler();
     }
 
     @Bean
-    public RememberMeAuthenticationFilter rememberMeAuthenticationFilter() throws Exception {
-        //重用WebSecurityConfigurerAdapter配置的AuthenticationManager，不然要自己组装AuthenticationManager
-        return new RememberMeAuthenticationFilter(authenticationManager(), rememberMeServices());
-    }
-
-    @Bean
     public AuthenticationSuccessHandler loginAuthenticationSuccessHandler() {
         return new DefaultAuthenticationSuccessHandler();
-    }
-
-    @Bean
-    public UserService wjcUserDetailsService() {
-        return new UserService();
     }
 
     @Bean
@@ -129,13 +116,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return jdbcTokenRepository;
     }
 
-    @Bean
-    public RememberMeServices rememberMeServices() {
-        DefaultRememberMeService rememberMeServices = new DefaultRememberMeService("INTERNAL_SECRET_KEY", wjcUserDetailsService(), persistentTokenRepository());
-        rememberMeServices.setParameter("rememberMe"); // 修改默认参数remember-me为rememberMe和前端请求中的key要一致
-        rememberMeServices.setTokenValiditySeconds(30 * 24 * 60 * 60);
-        return rememberMeServices;
-    }
     @Override
     public UserDetailsService userDetailsService() {
         return userService;
