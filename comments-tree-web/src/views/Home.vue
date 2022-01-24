@@ -18,7 +18,7 @@
                           outlined
                           rows="10"
                           row-height="10"
-                          v-model="newMsg"
+                          v-model="commentContent"
                           :counter="200"
                           :rules="[commentRule.required, commentRule.min, commentRule.max]"
                           data-cy="comment-text"
@@ -40,7 +40,7 @@
             <v-btn
               color="primary"
               text
-              v-on:click="saveMsg"
+              v-on:click="commentSave"
               :disabled="!commentSaveBtnAvailable"
               data-cy="comment-save"
             >
@@ -81,6 +81,22 @@
         </template>
       </v-treeview>
     </v-row>
+    <v-snackbar
+      v-model="snackbar"
+      :color="snackbarColor"
+      :timeout=3000
+    >
+      {{ snackbarText }}
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Close
+        </v-btn>
+      </template>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -95,13 +111,17 @@ import Comment from '@/components/Comment.vue'
 })
 export default class Home extends Vue {
   dialog = false
-  newMsg = ''
+  commentContent = ''
   items = []
   replyCommentId = 0
   nodeOpen = []
   commentsFormValid = true
   commentLabel = '留言'
   commentSaving = false
+
+  snackbar = false
+  snackbarColor = 'success'
+  snackbarText = ''
 
   commentRule = {
     required: (value: string) => !!value || '请输入留言',
@@ -140,27 +160,27 @@ export default class Home extends Vue {
     )
   }
 
-  saveMsg (): void {
-    console.log('saveMsg')
+  commentSave (): void {
     if ((this.$refs.commentForm as Vue & { validate: () => boolean }).validate()) {
       this.commentSaving = true
       Axios.post('/comment',
         {
-          content: this.newMsg,
+          content: this.commentContent,
           parentId: this.replyCommentId
         }).then((response: any) => {
         if (response.data.code === 200) {
           this.dialog = false
-          console.log('msg save success')
-          // to third party activate
+
+          this.snackbarColor = 'success'
+          this.snackbarText = response.data.data
+          this.snackbar = true
           this.loadCommentsTree()
-        } else if (response.data.code === 401) {
-          this.$store.commit('logout')
-          this.$router.push({ name: 'Login' })
         } else {
-          console.log('msg save failed')
+          this.snackbarColor = 'error'
+          this.snackbarText = response.data.data
+          this.snackbar = true
         }
-        this.newMsg = ''
+        this.commentContent = ''
       })
     } else {
       console.log('comments validate failed')

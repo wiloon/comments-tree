@@ -44,23 +44,30 @@ public class CommentController {
     /**
      * 新建留言
      *
-     * @param : content: 留言内容, parentId: 父节点ID
+     * @param comment: content: 留言内容, parentId: 父节点ID
      * @return 结果数据: 成功,失败
      */
     @RequestMapping(value = "/comment", method = RequestMethod.POST)
     @ResponseBody
     public String newComment(@RequestBody Comment comment) {
+        String content = comment.getContent();
+
+        if (content.length() > 200) {
+            return JSON.toJSONString(CommonResult.failed("保存失败"));
+        }
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUserByNameOrEmail(authentication.getName());
         String userId = user.getId();
         logger.info("new comment params: {}, user id: {}", comment, userId);
         try {
-            int id = commentService.newComment(comment.getContent(), userId, comment.getParentId());
+
+            int id = commentService.newComment(content, userId, comment.getParentId());
             logger.info("new comment created, id: {}", id);
-            return JSON.toJSONString(CommonResult.success("msg save"));
+            return JSON.toJSONString(CommonResult.success("保存成功"));
         } catch (Exception e) {
             e.printStackTrace();
-            return JSON.toJSONString(CommonResult.failed("failed to create comment"));
+            return JSON.toJSONString(CommonResult.failed("保存失败"));
         }
     }
 }

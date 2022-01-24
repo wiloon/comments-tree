@@ -2,6 +2,7 @@ package com.wiloon.comments.user;
 
 import com.alibaba.fastjson.JSON;
 import com.wiloon.comments.common.CommonResult;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,11 +27,21 @@ public class UserController {
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     @ResponseBody
     public String register(@RequestBody User params) {
-        logger.info("params: {}", params);
-        if (userService.isUserRegistered(params.getName(), params.getEmail())) {
+        logger.info("user register, params: {}", params);
+        String name = params.getName();
+        String password = params.getPassword();
+        if (StringUtils.isBlank(name) || name.length() < 5 || name.length() > 20) {
+            return JSON.toJSONString(CommonResult.failed("无效的用户名"));
+        }
+
+        if (StringUtils.isBlank(password) || password.length()< 8 || password.length() > 20){
+            return JSON.toJSONString(CommonResult.failed("无效的密码"));
+        }
+
+        if (userService.isUserRegistered(name, params.getEmail())) {
             return JSON.toJSONString(CommonResult.failed("用户已存在"));
         }
-        String id = userService.userRegister(params.getName(), params.getEmail(), params.getPassword());
+        String id = userService.userRegister(name, params.getEmail(), password);
         if (id == null || "".equals(id)) {
             return JSON.toJSONString(CommonResult.failed("用户注册失败"));
         }

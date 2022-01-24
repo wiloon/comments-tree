@@ -1,6 +1,8 @@
 package com.wiloon.comments;
 
 import com.wiloon.comments.common.browser.Browser;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
@@ -11,7 +13,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 public class BrowserCommandRunner implements CommandLineRunner {
-
+    private static final Logger logger = LoggerFactory.getLogger(BrowserCommandRunner.class);
     @Value("${spring.web.loginurl}")
     private String loginUrl;
 
@@ -26,14 +28,14 @@ public class BrowserCommandRunner implements CommandLineRunner {
     @Override
     public void run(String... args) {
         if (isOpen) {
-            System.out.println("自动加载指定的页面");
+            logger.info("invoke browser and open: {}", loginUrl);
             try {
                 browser.run(loginUrl);
                 // Runtime.getRuntime().exec("cmd /c start " + loginUrl);
                 // Runtime.getRuntime().exec(browserCommand + loginUrl);
             } catch (Exception ex) {
                 ex.printStackTrace();
-                System.out.println("浏览器打开页面异常");
+                logger.error("failed to invoke browser, url: {}", loginUrl);
             }
         }
     }
