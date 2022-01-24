@@ -26,31 +26,32 @@ public class CommentService {
     public CommentsTreeNode getSortedComments() {
         List<Comment> comments = commentsDao.getAllComments();
         logger.debug("comments size: {}", comments.size());
+        // 临时 map 用于收集留言依赖关系
         // key: comment id, value: comment tree node
         Map<Integer, CommentsTreeNode> tmpMap = new HashMap<>();
         for (Comment comment : comments) {
+            // 循环填充留言树
             logger.debug("parent id: {}, comment id: {}", comment.getParentId(), comment.getId());
-
+            // 留言包装成 tree node
             CommentsTreeNode currentNode = CommentsTreeNode.NewNode(comment);
             int parentId = currentNode.getParentId();
             int id = currentNode.getId();
             if (!tmpMap.containsKey(parentId)) {
-                // 如果父节点不在map里，创建一个 虚拟的tree node 加入 map, 创建根节点或者数据库返回无序列表时，预先创建父节点
+                // 如果父节点不在map里，创建一个虚拟的 tree node 加入 map, 创建根节点或者数据库返回无序列表时，预先创建父节点
                 tmpMap.put(currentNode.getParentId(), CommentsTreeNode.NewDummyNode(currentNode.getParentId()));
             }
-            // 从map里取出父节点，把当前节点加到父节点的评论集合里
+            // 从map里取出父节点
             CommentsTreeNode parentNode = tmpMap.get(parentId);
+            // 把当前节点加到父节点的评论集合里
             parentNode.addReply(currentNode);
-            logger.debug("comment id: {}, reply size: {}",
-                    parentNode.getComment() == null ? 0 : parentNode.getComment().getId(),
-                    parentNode.getReply() == null ? 0 : parentNode.getReply().size());
+            logger.debug("comment id: {}, reply size: {}", parentNode.getId(), parentNode.getReplySize());
             if (!tmpMap.containsKey(id) || tmpMap.get(id).isDummy()) {
                 //把自己的引用加到map里，方便收集评论
                 tmpMap.put(id, currentNode);
             }
         }
-        // 返回根节点
-        return tmpMap.get(0);
+        // 返回留言树根
+        return tmpMap.get(Comment.ROOT_NODE_ID);
     }
 
     /**

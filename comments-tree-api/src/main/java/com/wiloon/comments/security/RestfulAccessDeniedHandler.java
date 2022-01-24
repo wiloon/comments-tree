@@ -1,7 +1,7 @@
 package com.wiloon.comments.security;
 
-import cn.hutool.json.JSONUtil;
 import com.wiloon.comments.common.CommonResult;
+import org.eclipse.jetty.util.ajax.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,7 +24,7 @@ public class RestfulAccessDeniedHandler implements AccessDeniedHandler {
         response.setHeader("Cache-Control", "no-cache");
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        response.getWriter().println(JSONUtil.parse(CommonResult.forbidden(e.getMessage())));
+        response.getWriter().println(JSON.toString(CommonResult.forbidden(e.getMessage())));
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.getWriter().flush();
     }

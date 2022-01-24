@@ -2,6 +2,9 @@ package com.wiloon.comments.comment;
 
 import java.util.Date;
 
+/**
+ * 留言/评论
+ */
 public class CommentRaw {
     // 本条留言的id
     protected Integer id;

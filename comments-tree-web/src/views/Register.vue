@@ -124,11 +124,11 @@ export default class Register extends Vue {
           password: this.password
         }).then((response: any) => {
         if (response.data.code === 200) {
+          this.dialog = false
           this.snackbarColor = 'success'
-          this.snackbarText = response.data.message
+          this.snackbarText = response.data.data
           this.snackbar = true
-          this.$store.commit('login')
-          this.$router.push({ name: 'Home' })
+          this.$router.push({ name: 'Login' })
         } else {
           this.snackbarColor = 'error'
           this.snackbarText = response.data.message

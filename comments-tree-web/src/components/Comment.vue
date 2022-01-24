@@ -15,6 +15,7 @@
           text
           @click="reply"
           v-if="this.$store.state.login"
+          data-cy="reply-btn"
         >
           评论
         </v-btn>

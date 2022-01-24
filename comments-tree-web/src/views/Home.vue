@@ -21,6 +21,7 @@
                           v-model="newMsg"
                           :counter="200"
                           :rules="[commentRule.required, commentRule.min, commentRule.max]"
+                          data-cy="comment-text"
               ></v-textarea>
             </v-form>
           </v-card-text>
@@ -41,6 +42,7 @@
               text
               v-on:click="saveMsg"
               :disabled="!commentSaveBtnAvailable"
+              data-cy="comment-save"
             >
               保存
             </v-btn>
@@ -50,7 +52,11 @@
     </div>
     <v-row>
       <v-col>
-        <v-btn color="primary" @click="newComment" v-if="this.$store.state.login">
+        <v-btn color="primary"
+               @click="newComment"
+               v-if="this.$store.state.login"
+               data-cy="comment-new"
+        >
           留言
         </v-btn>
       </v-col>

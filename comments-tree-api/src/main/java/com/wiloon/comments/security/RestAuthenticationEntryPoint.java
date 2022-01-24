@@ -1,8 +1,7 @@
 package com.wiloon.comments.security;
 
-
-import cn.hutool.json.JSONUtil;
 import com.wiloon.comments.common.CommonResult;
+import org.eclipse.jetty.util.ajax.JSON;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.AuthenticationEntryPoint;
 
@@ -18,7 +17,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setHeader("Cache-Control","no-cache");
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json");
-        response.getWriter().println(JSONUtil.parse(CommonResult.unauthorized(authException.getMessage())));
+        response.getWriter().println(JSON.toString(CommonResult.unauthorized(authException.getMessage())));
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.getWriter().flush();
     }

@@ -16,6 +16,10 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     // 虚拟的节点标记
     private transient boolean dummy;
 
+    private CommentsTreeNode() {
+
+    }
+
     /**
      * 创建一个新的留言节点
      *
@@ -25,11 +29,13 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     public static CommentsTreeNode NewNode(Comment comment) {
         CommentsTreeNode node = new CommentsTreeNode();
         node.setComment(comment);
+        node.setReply(new TreeSet<>());
         return node;
     }
 
     /**
      * 创建一个虚拟的节点，如: 虚拟的根节点。
+     *
      * @param CommentId 留言id
      * @return 树节点
      */
@@ -42,6 +48,7 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
         tmp.setParentId(-1);
         node.setComment(tmp);
         node.setDummy(true);
+        node.setReply(new TreeSet<>());
         return node;
     }
 
@@ -59,9 +66,6 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
      * @param node 评论节点
      */
     public void addReply(CommentsTreeNode node) {
-        if (reply == null) {
-            this.reply = new TreeSet<>();
-        }
         reply.add(node);
     }
 
@@ -117,5 +121,13 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
 
     public void setDummy(boolean dummy) {
         this.dummy = dummy;
+    }
+
+    public int getReplySize() {
+        return reply == null ? 0 : reply.size();
+    }
+
+    public void setReply(TreeSet<CommentsTreeNode> reply) {
+        this.reply = reply;
     }
 }

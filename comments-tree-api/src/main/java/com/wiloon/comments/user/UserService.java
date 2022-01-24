@@ -11,6 +11,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Timestamp;
 import java.util.UUID;
 
 @Service
@@ -44,9 +45,9 @@ public class UserService implements UserDetailsService {
     }
 
     public String userRegister(String name, String email, String password) {
-        String sql = "INSERT INTO users (id,name,email,password) VALUES (?,?,?,?);";
+        String sql = "INSERT INTO users (id,name,email,password,create_time) VALUES (?,?,?,?,?);";
         String id = UUID.randomUUID().toString();
-        int result = jdbcTemplate.update(sql, id, name, email, hashPassword(password));
+        int result = jdbcTemplate.update(sql, id, name, email, hashPassword(password), new Timestamp(System.currentTimeMillis()));
         return result > 0 ? id : "";
     }
 

@@ -37,6 +37,10 @@ public class SortedCommentTest {
             list.add(new Comment(0, 3, sdf.parse("2022-01-23 00:02:00")));
 
             list.add(new Comment(1, 4, sdf.parse("2022-01-23 00:03:00")));
+            list.add(new Comment(1, 5, sdf.parse("2022-01-23 00:04:00")));
+            list.add(new Comment(4, 6, sdf.parse("2022-01-23 00:06:00")));
+
+            list.add(new Comment(3, 7, sdf.parse("2022-01-23 00:07:00")));
 
             Mockito.when(commentsDao.getAllComments()).thenReturn(list);
             CommentsTreeNode root = commentService.getSortedComments();
@@ -45,19 +49,28 @@ public class SortedCommentTest {
             Assert.assertEquals(3, root.getReply().size());
             Assert.assertTrue(3 == root.getReply().first().getComment().getId());
             Assert.assertTrue(1 == root.getReply().last().getId());
-            Assert.assertTrue(4 == root.getReply().last().getReply().first().getId());
+            Assert.assertTrue(5 == root //0
+                    .getReply().last() // 1
+                    .getReply().first().getId() // 5
+            );
+            Assert.assertTrue(4 == root //0
+                    .getReply().last() //1
+                    .getReply().last().getId()); // 4
+
+            Assert.assertTrue(6 == root //0
+                    .getReply().last() // 1
+                    .getReply().last() //4
+                    .getReply().first().getId() // 6
+            );
+
+            Assert.assertTrue(7 == root // 0
+                    .getReply().first() // 3
+                    .getReply().last().getId() // 7
+
+            );
         } catch (ParseException e) {
             e.printStackTrace();
         }
     }
 
-    @Test
-    public void testNewComment() throws Exception {
-        int id = commentService.newComment("content0内容0", "userId0", 0);
-        System.out.println("id:" + id);
-        Assert.assertTrue(id > 0);
-        int next = commentService.newComment("content1内容1", "userId1", 0);
-        System.out.println("next:" + next);
-        Assert.assertTrue(next > id);
-    }
 }

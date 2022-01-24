@@ -1,11 +1,14 @@
 package com.wiloon.comments.user;
 
 public class User {
-    public static final String SESSION_USER_ID_KEY = "userId";
     private String id;
     private String name;
     private String email;
     private transient String password;
+
+    public User() {
+
+    }
 
     public User(String name) {
         this.name = name;
@@ -47,5 +50,4 @@ public class User {
     public String toString() {
         return String.format("User, id: %s, name: %s, password: %s", this.id, this.name, this.password);
     }
-
 }

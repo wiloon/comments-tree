@@ -1,6 +1,5 @@
 package com.wiloon.comments.comment;
 
-import cn.hutool.json.JSONObject;
 import com.alibaba.fastjson.JSON;
 import com.wiloon.comments.common.CommonResult;
 import com.wiloon.comments.user.User;
@@ -44,18 +43,19 @@ public class CommentController {
 
     /**
      * 新建留言
-     * @param jsonParam: content: 留言内容, parentId: 父节点ID
+     *
+     * @param : content: 留言内容, parentId: 父节点ID
      * @return 结果数据: 成功,失败
      */
     @RequestMapping(value = "/comment", method = RequestMethod.POST)
     @ResponseBody
-    public String newComment(@RequestBody JSONObject jsonParam) {
+    public String newComment(@RequestBody Comment comment) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUserByNameOrEmail(authentication.getName());
         String userId = user.getId();
-        logger.info("new comment params: {}, user id: {}", jsonParam.toStringPretty(), userId);
+        logger.info("new comment params: {}, user id: {}", comment, userId);
         try {
-            int id = commentService.newComment(jsonParam.getStr("content"), userId, jsonParam.getInt("parentId"));
+            int id = commentService.newComment(comment.getContent(), userId, comment.getParentId());
             logger.info("new comment created, id: {}", id);
             return JSON.toJSONString(CommonResult.success("msg save"));
         } catch (Exception e) {

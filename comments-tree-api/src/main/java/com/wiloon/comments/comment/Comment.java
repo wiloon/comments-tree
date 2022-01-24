@@ -3,7 +3,11 @@ package com.wiloon.comments.comment;
 import java.util.Date;
 import java.util.Objects;
 
+/**
+ * 留言/评论，关联查询用
+ */
 public class Comment extends CommentRaw {
+    public static final int ROOT_NODE_ID = 0;
     // 父节点id
     private Integer parentId;
 

@@ -1,13 +1,11 @@
 package com.wiloon.comments.user;
 
-import cn.hutool.json.JSONObject;
 import com.alibaba.fastjson.JSON;
 import com.wiloon.comments.common.CommonResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -27,28 +25,16 @@ public class UserController {
      */
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     @ResponseBody
-    public String register(@RequestBody JSONObject jsonParam) {
-        logger.info("params: {}", jsonParam.toStringPretty());
-        String name = jsonParam.getStr("name");
-        String email = jsonParam.getStr("email");
-        String password = jsonParam.getStr("password");
-        if (userService.isUserRegistered(name, email)) {
+    public String register(@RequestBody User params) {
+        logger.info("params: {}", params);
+        if (userService.isUserRegistered(params.getName(), params.getEmail())) {
             return JSON.toJSONString(CommonResult.failed("用户已存在"));
         }
-        String id = userService.userRegister(name, email, password);
+        String id = userService.userRegister(params.getName(), params.getEmail(), params.getPassword());
         if (id == null || "".equals(id)) {
             return JSON.toJSONString(CommonResult.failed("用户注册失败"));
         }
-        User user = userService.getUserById(id);
-        setAuthentication(user);
-        return JSON.toJSONString(CommonResult.success("注册成功"));
-    }
-
-    private void setAuthentication(User user) {
-        CommentsTreeUserDetails commentsTreeUserDetails = new CommentsTreeUserDetails(user);
-        UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(commentsTreeUserDetails, null, commentsTreeUserDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        logger.info("login by user name success: {}", user);
+        return JSON.toJSONString(CommonResult.success("注册成功, 请登录。"));
     }
 
     /**

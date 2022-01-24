@@ -2,8 +2,6 @@ package com.wiloon.comments.security;
 
 import com.alibaba.fastjson.JSON;
 import com.wiloon.comments.common.CommonResult;
-import com.wiloon.comments.user.CommentsTreeUserDetails;
-import com.wiloon.comments.user.User;
 import com.wiloon.comments.user.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +22,7 @@ public class DefaultAuthenticationSuccessHandler implements AuthenticationSucces
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         logger.debug("name: {}", authentication.getName());
-        CommentsTreeUserDetails commentsTreeUserDetails = (CommentsTreeUserDetails) userService.loadUserByUsername(authentication.getName());
-        request.getSession().setAttribute(User.SESSION_USER_ID_KEY, commentsTreeUserDetails.getUserId());
+
         String accessControlAllowOrigin = request.getHeader("Access-Control-Allow-Origin");
         response.addHeader("Access-Control-Allow-Origin", accessControlAllowOrigin);
         response.addHeader("Access-Control-Allow-Credentials", "true");
