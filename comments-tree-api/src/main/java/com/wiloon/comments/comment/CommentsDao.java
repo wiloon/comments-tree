@@ -20,10 +20,20 @@ public class CommentsDao {
      * @return Comment 列表
      */
     public List<Comment> getAllComments() {
-        String sql = "SELECT ctp.parent_id,c.id,c.content,c.create_time,c.update_time,u.name as user_name, c.update_time from comments c JOIN comments_tree_path ctp ON c.id=ctp.child_id join users u on c.user_id=u.id order by ctp.parent_id,ctp.child_id;";
+        String sql = "SELECT ctp.parent_id,c.id,c.content,c.create_time," +
+                "c.update_time,u.name as user_name, c.update_time " +
+                "from comments c JOIN comments_tree_path ctp ON c.id=ctp.child_id " +
+                "join users u on c.user_id=u.id " +
+                "order by ctp.parent_id,ctp.child_id;";
         return jdbcTemplate.query(sql, new CommentRowMapper());
     }
 
+    /**
+     * 新建留言/评论
+     * @param content 留言内容
+     * @param userId 用户id
+     * @return 留言id
+     */
     public int insertComment(String content, String userId) {
         String sql = "INSERT INTO comments (content, user_id) VALUES (?,?);";
         KeyHolder keyHolder = new GeneratedKeyHolder();

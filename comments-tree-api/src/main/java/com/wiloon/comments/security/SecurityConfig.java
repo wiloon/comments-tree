@@ -52,7 +52,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         registry.antMatchers("/js/*").permitAll();
 
         registry.antMatchers(HttpMethod.POST, "/session").permitAll(); // 用户登录
-        // registry.antMatchers(HttpMethod.GET, "/session").permitAll(); // session 检查
+        registry.antMatchers(HttpMethod.GET, "/session").permitAll(); // session 检查
         registry.antMatchers("/comments").permitAll();  // 查询 comments 列表
         registry.antMatchers("/user").permitAll(); // 用户 注册
 

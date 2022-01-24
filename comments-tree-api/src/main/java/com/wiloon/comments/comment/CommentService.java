@@ -15,7 +15,6 @@ import java.util.*;
 public class CommentService {
     private static final Logger logger = LoggerFactory.getLogger(CommentService.class);
 
-
     @Autowired
     CommentsDao commentsDao;
 
@@ -46,7 +45,7 @@ public class CommentService {
                     parentNode.getComment() == null ? 0 : parentNode.getComment().getId(),
                     parentNode.getReply() == null ? 0 : parentNode.getReply().size());
             if (!tmpMap.containsKey(id) || tmpMap.get(id).isDummy()) {
-                //把自己加到map里，方便收集评论
+                //把自己的引用加到map里，方便收集评论
                 tmpMap.put(id, currentNode);
             }
         }

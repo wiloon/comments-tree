@@ -12,7 +12,6 @@ public class CommentRaw {
     // 修改时间
     protected Date updateTime;
 
-
     public Integer getId() {
         return id;
     }

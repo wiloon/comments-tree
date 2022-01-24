@@ -62,9 +62,10 @@ public class UserController {
         logger.info("session check");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || authentication.getName() == null) {
+        if (authentication == null || authentication.getName() == null || "anonymousUser".equals(authentication.getName())) {
             return JSON.toJSONString(CommonResult.unauthorized("用户未登录"));
         } else {
+            logger.info("session check, user name: {}", authentication.getName());
             User user = userService.getUserByNameOrEmail(authentication.getName());
             return JSON.toJSONString(CommonResult.success(user));
         }

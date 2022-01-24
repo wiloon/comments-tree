@@ -37,6 +37,7 @@
                       color="primary"
                       @click="login"
                       data-cy="login"
+                      style="margin-right: 10px"
                     >登录
                     </v-btn>
                     <v-btn x-large block @click="cancel">

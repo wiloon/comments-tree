@@ -35,12 +35,6 @@
                       counter>
                     </v-text-field>
                   </v-col>
-                  <v-col class="d-flex" cols="12" sm="6" xsm="12">
-                    <v-btn text @click="cancel">
-                      取消
-                    </v-btn>
-                  </v-col>
-                  <v-spacer></v-spacer>
                   <v-col class="d-flex" cols="12" sm="3" xsm="12" align-end>
                     <v-btn
                       data-cy="register-btn"
@@ -48,7 +42,12 @@
                       block
                       :disabled="!valid"
                       color="primary"
-                      @click="register"> 注册
+                      @click="register"
+                      style="margin-right: 10px"
+                    > 注册
+                    </v-btn>
+                    <v-btn x-large block @click="cancel">
+                      取消
                     </v-btn>
                   </v-col>
                 </v-row>

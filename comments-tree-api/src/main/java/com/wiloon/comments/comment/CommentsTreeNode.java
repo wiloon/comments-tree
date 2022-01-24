@@ -11,9 +11,10 @@ import java.util.TreeSet;
 public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     // 留言
     private Comment comment;
-    // 此条留言的评论
+    // 此条留言的评论集合
     private TreeSet<CommentsTreeNode> reply;
-    private boolean dummy;
+    // 虚拟的节点标记
+    private transient boolean dummy;
 
     /**
      * 创建一个新的留言节点
