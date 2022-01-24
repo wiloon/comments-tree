@@ -8,17 +8,23 @@
               <v-form ref="loginForm" v-model="valid" lazy-validation>
                 <v-row>
                   <v-col cols="12">
-                    <v-text-field data-cy="user-name" v-model="nameOrEmail" :rules="userNameRule" label="用户名/邮箱"
-                                  required></v-text-field>
+                    <v-text-field
+                      data-cy="user-name"
+                      v-model="nameOrEmail"
+                      :rules="userNameRule"
+                      label="用户名/邮箱"
+                      :validate-on-blur="true">
+                    </v-text-field>
                   </v-col>
                   <v-col cols="12">
                     <v-text-field
                       data-cy="password"
                       v-model="password"
-                      :rules="[passwordRule.required, passwordRule.min]"
-                      label="密码" hint="密码长度至少8位"
+                      :rules="[passwordRule.required, passwordRule.min, passwordRule.max,passwordRule.complexity]"
+                      label="密码"
                       type="password"
-                      counter>
+                      counter
+                      :validate-on-blur="true">
                     </v-text-field>
                   </v-col>
                   <v-col class="d-flex" cols="12" sm="6" xsm="12">
@@ -33,7 +39,6 @@
                     <v-btn
                       x-large
                       block
-                      :disabled="!valid"
                       color="primary"
                       @click="login"
                       data-cy="login"
@@ -96,7 +101,9 @@ export default class Login extends Vue {
 
   passwordRule = {
     required: (value: string) => !!value || '请输入密码',
-    min: (v: string) => (v && v.length >= 8) || '密码长度至少8位'
+    min: (v: string) => (v && v.length >= 8) || '密码长度至少8位',
+    max: (v: string) => (v && v.length <= 20) || '密码长度少于20位',
+    complexity: (v: string) => /^(?=.*?[a-z])(?=.*?[A-Z])(?=.*?\d)(?=.*?[!@#$%^&*()\-_=+;])[a-zA-Z\d!@#$%^&*()\-_=+;]*$/.test(v) || '密码复杂度太低，至少包含一个大写，一个小写，一个数字，一个特殊符号 (!@#$%^&*()-_=+;)'
   }
 
   login (): void {

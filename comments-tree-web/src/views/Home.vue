@@ -22,6 +22,7 @@
                           :counter="200"
                           :rules="[commentRule.required, commentRule.min, commentRule.max]"
                           data-cy="comment-text"
+                          :validate-on-blur="true"
               ></v-textarea>
             </v-form>
           </v-card-text>
@@ -132,15 +133,17 @@ export default class Home extends Vue {
   newComment (): void {
     this.commentSaving = false
     this.replyCommentId = 0
-    this.dialog = true
     this.commentLabel = '留言'
+    this.commentContent = ''
+    this.dialog = true
   }
 
   reply (commentId: number) {
     this.commentSaving = false
     this.replyCommentId = commentId
-    this.dialog = true
     this.commentLabel = '评论'
+    this.commentContent = ''
+    this.dialog = true
   }
 
   loadCommentsTree (): void {
@@ -174,13 +177,13 @@ export default class Home extends Vue {
           this.snackbarColor = 'success'
           this.snackbarText = response.data.data
           this.snackbar = true
+          this.commentContent = ''
           this.loadCommentsTree()
         } else {
           this.snackbarColor = 'error'
           this.snackbarText = response.data.data
           this.snackbar = true
         }
-        this.commentContent = ''
       })
     } else {
       console.log('comments validate failed')
@@ -208,7 +211,7 @@ export default class Home extends Vue {
   }
 
   get commentSaveBtnAvailable () {
-    return this.commentsFormValid && !this.commentSaving
+    return !this.commentSaving
   }
 }
 </script>

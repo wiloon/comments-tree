@@ -46,8 +46,9 @@ axios.interceptors.response.use(function (response) {
     } else {
       store.commit('increment')
     }
-
     return Promise.reject(error)
+  } else if (error.response.status === 401) {
+    alert('没有相关权限')
   }
   return Promise.reject(error)
 })

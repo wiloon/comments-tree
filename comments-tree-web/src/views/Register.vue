@@ -13,7 +13,7 @@
                       v-model="userName"
                       :rules="userNameRule"
                       label="用户名"
-                      required>
+                      :validate-on-blur="true">
                     </v-text-field>
                   </v-col>
                   <v-col cols="12">
@@ -22,7 +22,7 @@
                       v-model="email"
                       :rules="emailRule"
                       label="邮箱"
-                      required>
+                      :validate-on-blur="true">
                     </v-text-field>
                   </v-col>
                   <v-col cols="12">
@@ -30,9 +30,10 @@
                       data-cy="password"
                       v-model="password"
                       :rules="[passwordRule.required, passwordRule.min, passwordRule.max,passwordRule.complexity]"
-                      label="密码" hint="密码长度至少8位"
+                      label="密码"
                       type="password"
-                      counter>
+                      counter
+                      :validate-on-blur="true">
                     </v-text-field>
                   </v-col>
                   <v-col class="d-flex" cols="12" sm="3" xsm="12" align-end>
@@ -40,7 +41,6 @@
                       data-cy="register-btn"
                       x-large
                       block
-                      :disabled="!valid"
                       color="primary"
                       @click="register"
                       style="margin-right: 10px"
