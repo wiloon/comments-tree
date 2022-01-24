@@ -3,7 +3,7 @@
     <v-app-bar
       app
       color="primary"
-      dark
+      elevation="4"
     >
       <div class="d-flex align-center">
 
@@ -17,10 +17,29 @@
       >
         {{ userInfo }}
       </v-chip>
-      <v-btn data-cy="login-dialog" v-on:click="login" class="navBarItem" v-if="!this.$store.state.login">登录</v-btn>
-      <v-btn data-cy="register-dialog" v-on:click="register" class="navBarItem" v-if="!this.$store.state.login">注册
+      <v-btn
+        data-cy="login-dialog"
+        v-on:click="login"
+        class="navBtn"
+        v-if="!this.$store.state.login">
+        登录
       </v-btn>
-      <v-btn data-cy="logout-dialog" v-on:click="logout" class="navBarItem" v-if="this.$store.state.login">退出</v-btn>
+      <v-btn
+        data-cy="register-dialog"
+        v-on:click="register"
+        class="navBtn"
+        depressed
+        v-if="!this.$store.state.login">
+        注册
+      </v-btn>
+      <v-btn
+        data-cy="logout-dialog"
+        v-on:click="logout"
+        class="navBtn"
+        depressed
+        v-if="this.$store.state.login">
+        退出
+      </v-btn>
     </v-app-bar>
 
     <v-main>
@@ -116,3 +135,8 @@ export default Vue.extend({
   }
 })
 </script>
+<style scoped lang="stylus">
+.navBtn
+  margin-left 5px
+
+</style>

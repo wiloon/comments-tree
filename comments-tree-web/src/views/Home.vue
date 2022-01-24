@@ -1,27 +1,20 @@
 <template>
   <v-container>
-    <v-row>
-      <v-col>
-        <v-btn color="primary" @click="newComment" v-if="this.$store.state.login">
-          留言
-        </v-btn>
-      </v-col>
-    </v-row>
-    <v-row class="text-center">
-      <v-col cols="12">
-        <!-- 留言 dialog -->
-        <v-dialog
-          v-model="dialog"
-          persistent
-          max-width="290"
-          class="comment-dialog"
-        >
-          <v-form ref="commentForm" v-model="commentsFormValid" lazy-validation>
-            <v-card>
+    <div class="text-center">
+      <!-- 留言 dialog -->
+      <v-dialog
+        v-model="dialog"
+        width="500"
+      >
+        <v-card>
+          <v-card-title class="text-h5 grey lighten-2">
+            {{ commentLabel }}
+          </v-card-title>
+
+          <v-card-text class="comment-content">
+            <v-form ref="commentForm" v-model="commentsFormValid" lazy-validation>
               <!-- 留言 text -->
-              <v-textarea class="comment-content"
-                          :label="commentLabel"
-                          auto-grow
+              <v-textarea auto-grow
                           outlined
                           rows="10"
                           row-height="10"
@@ -29,31 +22,38 @@
                           :counter="200"
                           :rules="[commentRule.required, commentRule.min, commentRule.max]"
               ></v-textarea>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                  color="green darken-1"
-                  text
-                  @click="dialog = false"
-                >
-                  取消
-                </v-btn>
-                <v-btn
-                  color="green darken-1"
-                  text
-                  v-on:click="saveMsg"
-                  :disabled="!commentSaveBtnAvailable"
-                >
-                  保存
-                </v-btn>
-              </v-card-actions>
-            </v-card>
-          </v-form>
-        </v-dialog>
-      </v-col>
-    </v-row>
-    <v-row>
+            </v-form>
+          </v-card-text>
 
+          <v-divider></v-divider>
+
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn
+              color="primary"
+              text
+              @click="dialog = false"
+            >
+              取消
+            </v-btn>
+            <v-btn
+              color="primary"
+              text
+              v-on:click="saveMsg"
+              :disabled="!commentSaveBtnAvailable"
+            >
+              保存
+            </v-btn>
+          </v-card-actions>
+        </v-card>
+      </v-dialog>
+    </div>
+    <v-row>
+      <v-col>
+        <v-btn color="primary" @click="newComment" v-if="this.$store.state.login">
+          留言
+        </v-btn>
+      </v-col>
     </v-row>
     <v-row>
       <!-- 树形留言 -->
@@ -189,8 +189,5 @@ export default class Home extends Vue {
 
 <style scoped lang="stylus">
 .comment-content
-  margin: 10px
-
-.comment-dialog
-  padding-top; 10px
+  margin-top 10px
 </style>
