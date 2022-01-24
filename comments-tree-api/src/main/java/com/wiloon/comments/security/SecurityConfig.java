@@ -136,7 +136,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         rememberMeServices.setTokenValiditySeconds(30 * 24 * 60 * 60);
         return rememberMeServices;
     }
-
     @Override
     public UserDetailsService userDetailsService() {
         return userService;

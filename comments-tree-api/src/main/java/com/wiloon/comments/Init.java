@@ -41,17 +41,5 @@ public class Init implements ServletContextAware {
                 return null;
             }
         });
-        jdbcTemplate.execute(new ConnectionCallback() {
-            @Override
-            public Object doInConnection(Connection con) throws SQLException, DataAccessException {
-                con.setAutoCommit(false);
-                ClassPathResource classPathResource = new ClassPathResource("jdbc/test-data.sql");
-                EncodedResource encodedResource = new EncodedResource(classPathResource, "utf-8");
-                ScriptUtils.executeSqlScript(con, encodedResource);
-                con.commit();
-                logger.info("sql executed: {}", classPathResource.getPath());
-                return null;
-            }
-        });
     }
 }

@@ -1,7 +1,5 @@
 package com.wiloon.comments.user;
 
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-
 public class User {
     public static final String SESSION_USER_ID_KEY = "userId";
     private String id;

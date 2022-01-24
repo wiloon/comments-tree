@@ -3,19 +3,22 @@ package com.wiloon.comments.comment;
 import java.util.Date;
 import java.util.Objects;
 
-public class Comment {
+public class Comment extends CommentRaw {
     // 父节点id
     private Integer parentId;
-    // 本条留言的id
-    private Integer id;
-    // 留言内容
-    private String content;
+
     // 用户信息
     private String userName;
-    // 创建时间
-    private Date createTime;
-    // 修改时间
-    private Date updateTime;
+
+    public Comment() {
+
+    }
+
+    public Comment(int parentId, int id, Date updateTime) {
+        this.parentId = parentId;
+        this.id = id;
+        this.updateTime = updateTime;
+    }
 
     public Integer getParentId() {
         return parentId;
@@ -25,44 +28,12 @@ public class Comment {
         this.parentId = parentId;
     }
 
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(String content) {
-        this.content = content;
-    }
-
     public String getUserName() {
         return userName;
     }
 
     public void setUserName(String userName) {
         this.userName = userName;
-    }
-
-    public Date getCreateTime() {
-        return createTime;
-    }
-
-    public void setCreateTime(Date createTime) {
-        this.createTime = createTime;
-    }
-
-    public Date getUpdateTime() {
-        return updateTime;
-    }
-
-    public void setUpdateTime(Date updateTime) {
-        this.updateTime = updateTime;
     }
 
     @Override
