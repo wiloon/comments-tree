@@ -30,7 +30,18 @@
                       data-cy="password"
                       v-model="password"
                       :rules="[passwordRule.required, passwordRule.min, passwordRule.max,passwordRule.complexity]"
-                      label="密码"
+                      label="输入密码"
+                      type="password"
+                      counter
+                      :validate-on-blur="true">
+                    </v-text-field>
+                  </v-col>
+                  <v-col cols="12">
+                    <v-text-field
+                      data-cy="passwordConfirm"
+                      v-model="passwordConfirm"
+                      :rules="[passwordRule.required, passwordRule.min, passwordRule.max,passwordRule.complexity]"
+                      label="确认密码"
                       type="password"
                       counter
                       :validate-on-blur="true">
@@ -95,6 +106,7 @@ export default class Register extends Vue {
 
   userName = ''
   password = ''
+  passwordConfirm = ''
   email = ''
   isUserLogin = false
   userNameRule = [
@@ -116,6 +128,12 @@ export default class Register extends Vue {
 
   // user register
   register (): void {
+    if (this.password !== this.passwordConfirm) {
+      this.snackbarColor = 'error'
+      this.snackbarText = '两次输入密码不一致'
+      this.snackbar = true
+      return
+    }
     if ((this.$refs.loginForm as Vue & { validate: () => boolean }).validate()) {
       Axios.post('/user',
         {
