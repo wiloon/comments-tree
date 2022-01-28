@@ -1,9 +1,22 @@
 package com.wiloon.comments.user;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
+
+/**
+ * 用户
+ * @author wiloon
+ */
 public class User {
+    public static final String ANONYMOUS_USER="anonymousUser";
     private String id;
+    @NotBlank
+    @Size(min = 5, max = 20)
     private String name;
+    @NotBlank
     private String email;
+    @NotBlank
+    @Size(min = 8, max = 20)
     private transient String password;
 
     public User() {

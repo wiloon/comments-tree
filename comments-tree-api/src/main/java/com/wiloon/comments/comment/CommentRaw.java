@@ -1,18 +1,30 @@
 package com.wiloon.comments.comment;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.Date;
 
 /**
  * 留言/评论
  */
 public class CommentRaw {
-    // 本条留言的id
+    /**
+     * 本条留言的id
+     */
     protected Integer id;
-    // 留言内容
+    /**
+     * 留言内容
+     */
+    @NotBlank
+    @Size(min = 3, max = 200)
     protected String content;
-    // 创建时间
+    /**
+     * 创建时间
+     */
     protected Date createTime;
-    // 修改时间
+    /**
+     * 修改时间
+     */
     protected Date updateTime;
 
     public Integer getId() {

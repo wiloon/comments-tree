@@ -1,17 +1,24 @@
 package com.wiloon.comments.comment;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.Objects;
 
 /**
  * 留言/评论，关联查询用
+ * @author wiloon
  */
 public class Comment extends CommentRaw {
     public static final int ROOT_NODE_ID = 0;
-    // 父节点id
+    /**
+     * 父节点id
+     */
+    @NotNull
     private Integer parentId;
 
-    // 用户信息
+    /**
+     * 用户信息
+     */
     private String userName;
 
     public Comment() {

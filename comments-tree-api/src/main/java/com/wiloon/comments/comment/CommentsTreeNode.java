@@ -7,13 +7,20 @@ import java.util.TreeSet;
 
 /**
  * 留言树节点
+ * @author wiloon
  */
 public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
-    // 留言
+    /**
+     * 留言
+     */
     private Comment comment;
-    // 此条留言的评论集合
+    /**
+     * 此条留言的评论集合
+     */
     private TreeSet<CommentsTreeNode> reply;
-    // 虚拟的节点标记
+    /**
+     * 虚拟的节点标记
+     */
     private transient boolean dummy;
 
     private CommentsTreeNode() {
@@ -26,7 +33,7 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
      * @param comment 留言
      * @return 树节点
      */
-    public static CommentsTreeNode NewNode(Comment comment) {
+    public static CommentsTreeNode newNode(Comment comment) {
         CommentsTreeNode node = new CommentsTreeNode();
         node.setComment(comment);
         node.setReply(new TreeSet<>());
@@ -36,13 +43,13 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     /**
      * 创建一个虚拟的节点，如: 虚拟的根节点。
      *
-     * @param CommentId 留言id
+     * @param CommentID 留言id
      * @return 树节点
      */
-    public static CommentsTreeNode NewDummyNode(int CommentId) {
+    public static CommentsTreeNode newDummyNode(int CommentID) {
         CommentsTreeNode node = new CommentsTreeNode();
         Comment tmp = new Comment();
-        tmp.setId(CommentId);
+        tmp.setId(CommentID);
         tmp.setUserName("");
         tmp.setContent("");
         tmp.setParentId(-1);
@@ -129,5 +136,15 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
 
     public void setReply(TreeSet<CommentsTreeNode> reply) {
         this.reply = reply;
+    }
+
+    @Override
+    public int hashCode() {
+        return super.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        return super.equals(obj);
     }
 }

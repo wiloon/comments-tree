@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -17,8 +18,11 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 /**
  * 留言/评论 controller
+ *
+ * @author wiloon
  */
 @Controller
+@Validated
 public class CommentController {
     private static final Logger logger = LoggerFactory.getLogger(CommentController.class);
     @Autowired
@@ -33,12 +37,10 @@ public class CommentController {
      */
     @RequestMapping(value = "/comments", method = RequestMethod.GET)
     @ResponseBody
-    public String comments() {
+    public CommonResult<CommentsTreeNode> comments() {
         logger.info("get comment list");
         CommentsTreeNode commentsTreeNode = commentService.getSortedComments();
-        String comments = JSON.toJSONString(CommonResult.success(commentsTreeNode));
-        logger.debug("comment list: {}", comments);
-        return comments;
+        return CommonResult.success(commentsTreeNode);
     }
 
     /**
@@ -49,25 +51,20 @@ public class CommentController {
      */
     @RequestMapping(value = "/comment", method = RequestMethod.POST)
     @ResponseBody
-    public String newComment(@RequestBody Comment comment) {
+    public CommonResult<String> newComment(@RequestBody Comment comment) {
         String content = comment.getContent();
-
-        if (content.length() > 200) {
-            return JSON.toJSONString(CommonResult.failed("保存失败"));
-        }
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         User user = userService.getUserByNameOrEmail(authentication.getName());
         String userId = user.getId();
         logger.info("new comment params: {}, user id: {}", comment, userId);
         try {
-
             int id = commentService.newComment(content, userId, comment.getParentId());
             logger.info("new comment created, id: {}", id);
-            return JSON.toJSONString(CommonResult.success("保存成功"));
+            return CommonResult.success("保存成功");
         } catch (Exception e) {
             e.printStackTrace();
-            return JSON.toJSONString(CommonResult.failed("保存失败"));
+            return CommonResult.failed("保存失败");
         }
     }
 }

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 /**
  * spring boot 容器加载后自动监听
  */
-@Component
+// @Component
 public class BrowserCommandRunner implements CommandLineRunner {
     private static final Logger logger = LoggerFactory.getLogger(BrowserCommandRunner.class);
     @Value("${spring.web.loginurl}")
@@ -31,8 +31,6 @@ public class BrowserCommandRunner implements CommandLineRunner {
             logger.info("invoke browser and open: {}", loginUrl);
             try {
                 browser.run(loginUrl);
-                // Runtime.getRuntime().exec("cmd /c start " + loginUrl);
-                // Runtime.getRuntime().exec(browserCommand + loginUrl);
             } catch (Exception ex) {
                 ex.printStackTrace();
                 logger.error("failed to invoke browser, url: {}", loginUrl);

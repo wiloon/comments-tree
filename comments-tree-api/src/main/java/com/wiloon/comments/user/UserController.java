@@ -1,8 +1,6 @@
 package com.wiloon.comments.user;
 
-import com.alibaba.fastjson.JSON;
 import com.wiloon.comments.common.CommonResult;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +12,8 @@ import org.springframework.web.bind.annotation.*;
 
 /**
  * 用户 controller
+ *
+ * @author wiloon
  */
 @Controller
 public class UserController {
@@ -26,26 +26,19 @@ public class UserController {
      */
     @RequestMapping(value = "/user", method = RequestMethod.POST)
     @ResponseBody
-    public String register(@RequestBody User params) {
+    public CommonResult<String> register(@RequestBody User params) {
         logger.info("user register, params: {}", params);
         String name = params.getName();
         String password = params.getPassword();
-        if (StringUtils.isBlank(name) || name.length() < 5 || name.length() > 20) {
-            return JSON.toJSONString(CommonResult.failed("无效的用户名"));
-        }
-
-        if (StringUtils.isBlank(password) || password.length()< 8 || password.length() > 20){
-            return JSON.toJSONString(CommonResult.failed("无效的密码"));
-        }
 
         if (userService.isUserRegistered(name, params.getEmail())) {
-            return JSON.toJSONString(CommonResult.failed("用户已存在"));
+            return CommonResult.failed("用户已存在");
         }
         String id = userService.userRegister(name, params.getEmail(), password);
         if (id == null || "".equals(id)) {
-            return JSON.toJSONString(CommonResult.failed("用户注册失败"));
+            return CommonResult.failed("用户注册失败");
         }
-        return JSON.toJSONString(CommonResult.success("注册成功, 请登录。"));
+        return CommonResult.success("注册成功, 请登录。");
     }
 
     /**
@@ -55,16 +48,16 @@ public class UserController {
      */
     @RequestMapping(value = "/session", method = RequestMethod.GET)
     @ResponseBody
-    public String sessionCheck() {
+    public CommonResult sessionCheck() {
         logger.info("session check");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null || authentication.getName() == null || "anonymousUser".equals(authentication.getName())) {
-            return JSON.toJSONString(CommonResult.unauthorized("用户未登录"));
+        if (authentication == null || authentication.getName() == null || User.ANONYMOUS_USER.equals(authentication.getName())) {
+            return CommonResult.unauthorized("用户未登录");
         } else {
             logger.info("session check, user name: {}", authentication.getName());
             User user = userService.getUserByNameOrEmail(authentication.getName());
-            return JSON.toJSONString(CommonResult.success(user));
+            return CommonResult.success(user);
         }
     }
 }

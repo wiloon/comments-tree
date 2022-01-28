@@ -47,30 +47,25 @@ public class SortedCommentTest {
             Assert.assertNotNull(root);
             Assert.assertNotNull(root.getComment());
             Assert.assertEquals(3, root.getReply().size());
-            Assert.assertTrue(3 == root.getReply().first().getComment().getId());
-            Assert.assertTrue(1 == root.getReply().last().getId());
-            Assert.assertTrue(5 == root //0
+            Assert.assertEquals(3, (int) root.getReply().first().getComment().getId());
+            Assert.assertEquals(1, root.getReply().last().getId());
+            Assert.assertEquals(5, root //0
                     .getReply().last() // 1
-                    .getReply().first().getId() // 5
-            );
-            Assert.assertTrue(4 == root //0
+                    .getReply().first().getId());
+            Assert.assertEquals(4, root //0
                     .getReply().last() //1
                     .getReply().last().getId()); // 4
 
-            Assert.assertTrue(6 == root //0
+            Assert.assertEquals(6, root //0
                     .getReply().last() // 1
                     .getReply().last() //4
-                    .getReply().first().getId() // 6
-            );
+                    .getReply().first().getId());
 
-            Assert.assertTrue(7 == root // 0
+            Assert.assertEquals(7, root // 0
                     .getReply().first() // 3
-                    .getReply().last().getId() // 7
-
-            );
+                    .getReply().last().getId());
         } catch (ParseException e) {
             e.printStackTrace();
         }
     }
-
 }

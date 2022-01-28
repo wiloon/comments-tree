@@ -10,6 +10,8 @@ import java.util.*;
 
 /**
  * Comment service
+ *
+ * @author wiloon
  */
 @Service
 public class CommentService {
@@ -28,17 +30,17 @@ public class CommentService {
         logger.debug("comments size: {}", comments.size());
         // 临时 map 用于收集留言依赖关系
         // key: comment id, value: comment tree node
-        Map<Integer, CommentsTreeNode> tmpMap = new HashMap<>();
+        Map<Integer, CommentsTreeNode> tmpMap = new HashMap<>(comments.size() + 1);
         for (Comment comment : comments) {
             // 循环填充留言树
             logger.debug("parent id: {}, comment id: {}", comment.getParentId(), comment.getId());
             // 留言包装成 tree node
-            CommentsTreeNode currentNode = CommentsTreeNode.NewNode(comment);
+            CommentsTreeNode currentNode = CommentsTreeNode.newNode(comment);
             int parentId = currentNode.getParentId();
             int id = currentNode.getId();
             if (!tmpMap.containsKey(parentId)) {
                 // 如果父节点不在map里，创建一个虚拟的 tree node 加入 map, 创建根节点或者数据库返回无序列表时，预先创建父节点
-                tmpMap.put(currentNode.getParentId(), CommentsTreeNode.NewDummyNode(currentNode.getParentId()));
+                tmpMap.put(currentNode.getParentId(), CommentsTreeNode.newDummyNode(currentNode.getParentId()));
             }
             // 从map里取出父节点
             CommentsTreeNode parentNode = tmpMap.get(parentId);
