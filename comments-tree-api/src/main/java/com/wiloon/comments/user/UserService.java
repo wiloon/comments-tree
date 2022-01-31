@@ -67,4 +67,10 @@ public class UserService implements UserDetailsService {
         }
         return user;
     }
+
+    public void deleteUser(String id) {
+        String sql = "delete from  users  where id=?";
+
+        jdbcTemplate.update(sql, id);
+    }
 }

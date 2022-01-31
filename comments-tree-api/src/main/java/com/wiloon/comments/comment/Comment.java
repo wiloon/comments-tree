@@ -6,6 +6,7 @@ import java.util.Objects;
 
 /**
  * 留言/评论，关联查询用
+ *
  * @author wiloon
  */
 public class Comment extends CommentRaw {
@@ -49,8 +50,12 @@ public class Comment extends CommentRaw {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         Comment comment = (Comment) o;
         return id.equals(comment.id);
     }
@@ -60,6 +65,7 @@ public class Comment extends CommentRaw {
         return Objects.hash(id);
     }
 
+    @Override
     public String toString() {
         return String.format("parent id: %s, id: %s, content: %s", this.parentId, this.id, this.content);
     }

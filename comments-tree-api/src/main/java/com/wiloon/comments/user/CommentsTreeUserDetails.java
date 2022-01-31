@@ -8,10 +8,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+/**
+ * Spring security user detail
+ * @author wiloon
+ */
 public class CommentsTreeUserDetails implements UserDetails {
     String name;
     String password;
-    private User user;
+    private final User user;
 
     public CommentsTreeUserDetails(User user) {
         this.name = user.getName();

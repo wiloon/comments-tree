@@ -17,6 +17,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.TreeSet;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
@@ -43,26 +44,21 @@ public class SortedCommentTest {
             list.add(new Comment(3, 7, sdf.parse("2022-01-23 00:07:00")));
 
             Mockito.when(commentsDao.getAllComments()).thenReturn(list);
-            CommentsTreeNode root = commentService.getSortedComments();
-            Assert.assertNotNull(root);
-            Assert.assertNotNull(root.getComment());
-            Assert.assertEquals(3, root.getReply().size());
-            Assert.assertEquals(3, (int) root.getReply().first().getComment().getId());
-            Assert.assertEquals(1, root.getReply().last().getId());
-            Assert.assertEquals(5, root //0
-                    .getReply().last() // 1
+            TreeSet<CommentsTreeNode> topComments = commentService.getSortedComments();
+            Assert.assertNotNull(topComments);
+            Assert.assertEquals(3, topComments.size());
+            Assert.assertEquals(3, (int) topComments.first().getComment().getId());
+            Assert.assertEquals(1, topComments.last().getId());
+            Assert.assertEquals(5, topComments.last() // 1
                     .getReply().first().getId());
-            Assert.assertEquals(4, root //0
-                    .getReply().last() //1
+            Assert.assertEquals(4, topComments.last() //1
                     .getReply().last().getId()); // 4
 
-            Assert.assertEquals(6, root //0
-                    .getReply().last() // 1
+            Assert.assertEquals(6, topComments.last() // 1
                     .getReply().last() //4
                     .getReply().first().getId());
 
-            Assert.assertEquals(7, root // 0
-                    .getReply().first() // 3
+            Assert.assertEquals(7, topComments.first() // 3
                     .getReply().last().getId());
         } catch (ParseException e) {
             e.printStackTrace();

@@ -16,6 +16,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.TreeSet;
+
 /**
  * 留言/评论 controller
  *
@@ -37,9 +39,9 @@ public class CommentController {
      */
     @RequestMapping(value = "/comments", method = RequestMethod.GET)
     @ResponseBody
-    public CommonResult<CommentsTreeNode> comments() {
+    public CommonResult<TreeSet<CommentsTreeNode>> comments() {
         logger.info("get comment list");
-        CommentsTreeNode commentsTreeNode = commentService.getSortedComments();
+        TreeSet<CommentsTreeNode> commentsTreeNode = commentService.getSortedComments();
         return CommonResult.success(commentsTreeNode);
     }
 

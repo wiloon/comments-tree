@@ -18,19 +18,16 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
-import org.springframework.security.web.authentication.RememberMeServices;
-
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
-import org.springframework.security.web.authentication.rememberme.PersistentTokenBasedRememberMeServices;
 import org.springframework.security.web.authentication.rememberme.PersistentTokenRepository;
-import org.springframework.security.web.authentication.rememberme.RememberMeAuthenticationFilter;
 
-import javax.servlet.Filter;
 import javax.sql.DataSource;
-import java.util.UUID;
 
-
+/**
+ * spring security config
+ * @author wiloon
+ */
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -50,11 +47,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         registry.antMatchers("/css/*").permitAll();
         registry.antMatchers("/fonts/*").permitAll();
         registry.antMatchers("/js/*").permitAll();
-
-        registry.antMatchers(HttpMethod.POST, "/session").permitAll(); // 用户登录
-        registry.antMatchers(HttpMethod.GET, "/session").permitAll(); // session 检查
-        registry.antMatchers("/comments").permitAll();  // 查询 comments 列表
-        registry.antMatchers("/user").permitAll(); // 用户 注册
+// 用户登录
+        registry.antMatchers(HttpMethod.POST, "/session").permitAll();
+        // session 检查
+        registry.antMatchers(HttpMethod.GET, "/session").permitAll();
+        // 查询 comments 列表
+        registry.antMatchers("/comments").permitAll();
+        // 用户 注册
+        registry.antMatchers("/user").permitAll();
 
         // 跨域的 OPTIONS 请求
         registry.antMatchers(HttpMethod.OPTIONS).permitAll();
@@ -62,7 +62,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         // logout
         registry.and().logout()
                 .logoutUrl("/logout")
-                .logoutSuccessHandler(logoutSuccessHandler()) // 登出成功handler
+                // 登出成功handler
+                .logoutSuccessHandler(logoutSuccessHandler())
                 .deleteCookies("JSESSIONID")
                 .and().authorizeRequests()
                 .anyRequest()
@@ -71,7 +72,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().csrf()
                 .disable()
                 .sessionManagement()
-                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS) // 使用session
+                // 使用session
+                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
                 // 自定义权限拒绝类
                 .and().exceptionHandling()
                 .accessDeniedHandler(restfulAccessDeniedHandler())
@@ -86,16 +88,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and().formLogin()
                 .loginProcessingUrl("/session")
                 .usernameParameter("nameOrEmail")
-                .successHandler(loginAuthenticationSuccessHandler()) // form login auth success handler
-                .failureHandler(formLoginFailedHandler()) // form login auth failed handler
-                ;
+                // form login auth success handler
+                .successHandler(loginAuthenticationSuccessHandler())
+                // form login auth failed handler
+                .failureHandler(formLoginFailedHandler());
 
 
     }
 
     @Bean
     public AuthenticationFailureHandler formLoginFailedHandler() {
-        return new FormLoginAuthFailurHandler();
+        return new FormLoginAuthFailureHandler();
     }
 
     @Bean

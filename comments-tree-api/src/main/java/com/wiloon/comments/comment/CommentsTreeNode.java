@@ -18,10 +18,6 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
      * 此条留言的评论集合
      */
     private TreeSet<CommentsTreeNode> reply;
-    /**
-     * 虚拟的节点标记
-     */
-    private transient boolean dummy;
 
     private CommentsTreeNode() {
 
@@ -43,18 +39,17 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     /**
      * 创建一个虚拟的节点，如: 虚拟的根节点。
      *
-     * @param CommentID 留言id
+     * @param commentID 留言id
      * @return 树节点
      */
-    public static CommentsTreeNode newDummyNode(int CommentID) {
+    public static CommentsTreeNode newNode(int commentID) {
         CommentsTreeNode node = new CommentsTreeNode();
         Comment tmp = new Comment();
-        tmp.setId(CommentID);
+        tmp.setId(commentID);
         tmp.setUserName("");
         tmp.setContent("");
         tmp.setParentId(-1);
         node.setComment(tmp);
-        node.setDummy(true);
         node.setReply(new TreeSet<>());
         return node;
     }
@@ -120,14 +115,6 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
     public Date getUpdateTime() {
         return this.comment.getUpdateTime();
-    }
-
-    public boolean isDummy() {
-        return dummy;
-    }
-
-    public void setDummy(boolean dummy) {
-        this.dummy = dummy;
     }
 
     public int getReplySize() {

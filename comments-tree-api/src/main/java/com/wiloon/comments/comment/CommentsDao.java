@@ -27,7 +27,7 @@ public class CommentsDao {
         String sql = "SELECT ctp.parent_id,c.id,c.content,c.create_time," +
                 "c.update_time,u.name as user_name, c.update_time " +
                 "from comments c JOIN comments_tree_path ctp ON c.id=ctp.child_id " +
-                "join users u on c.user_id=u.id " +
+                "left join users u on c.user_id=u.id " +
                 "order by ctp.parent_id,ctp.child_id desc";
         return jdbcTemplate.query(sql, new CommentRowMapper());
     }
@@ -68,4 +68,8 @@ public class CommentsDao {
         jdbcTemplate.update(treePathSql, parentId, commentId);
     }
 
+    public void deleteComment(int id) {
+        String sql = "delete from  comments  where id=?";
+        jdbcTemplate.update(sql, id);
+    }
 }

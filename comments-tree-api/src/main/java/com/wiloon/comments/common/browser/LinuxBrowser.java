@@ -11,6 +11,7 @@ public class LinuxBrowser extends Browser {
     public LinuxBrowser() {
     }
 
+    @Override
     public void run(String url) throws IOException {
         try {
             String[] browsers = {"chromium", "google-chrome-stable", "firefox", "google-chrome-beta"};
