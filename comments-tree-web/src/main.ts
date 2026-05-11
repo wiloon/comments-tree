@@ -9,8 +9,8 @@ import axios from 'axios'
 
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
-console.log('env: ' + process.env.NODE_ENV)
-if (process.env.NODE_ENV !== 'production') {
+console.log('env: ' + import.meta.env.MODE)
+if (import.meta.env.MODE !== 'production') {
   axios.defaults.baseURL = '/api'
 }
 new Vue({

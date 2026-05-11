@@ -4,15 +4,44 @@
 
 这是 2022 年面试某远程职位时对方给出的带回家面试题，限时一周完成。题目要求实现一个前后端分离的树形留言评论系统。当时我只有 Java 经验，没有在生产项目中使用过 Spring Boot，代码是一边查资料一边开发、在一周内完成的。
 
-2026 年为准备面试一个 Java Spring Boot 职位，重新整理了项目，升级了 JDK 及部分依赖包版本，补充了 Taskfile 以方便本地开发启动。
+2026 年为准备面试一个 Java Spring Boot 职位，重新整理了项目，进行了以下升级：
+
+- **Java 8 → Java 17**，**Spring Boot 2.6.3 → 3.5.14**（Jakarta EE、Spring Security 6.x Lambda DSL、JUnit 5）
+- **Vue CLI（webpack 4）→ Vite 4**（解决 Node 18 + OpenSSL 3 兼容性问题）
+- 修复安全漏洞：fastjson 1.2.83、sqlite-jdbc 3.47.1.0（CVE-2023-32697）
+- 补充 e2e 测试（Playwright）、完善 Taskfile
+
+完整升级记录见 [docs/specs/upgrade.md](docs/specs/upgrade.md)。
+
+## 技术栈
+
+### 后端
+
+| 组件                       | 版本                 |
+| -------------------------- | -------------------- |
+| Java                       | 17                   |
+| Spring Boot                | 3.5.14               |
+| Spring Security            | 6.5.x                |
+| SQLite（生产）/ H2（测试） | sqlite-jdbc 3.47.1.0 |
+| Maven                      | 3.9+                 |
+
+### 前端
+
+| 组件       | 版本               |
+| ---------- | ------------------ |
+| Vue.js     | 2.6.x              |
+| Vuetify    | 2.x                |
+| TypeScript | ~4.1.5             |
+| Vite       | ^4.5.9             |
+| Node.js    | 18.20.8（via fnm） |
 
 ## 本地开发启动
 
 ### 依赖
 
 - JDK 17+
-- Maven 3.6+
-- Node.js 16.13.2（通过 [fnm](https://github.com/Schniz/fnm) 管理）
+- Maven 3.9+
+- Node.js 18（通过 [fnm](https://github.com/Schniz/fnm) 管理）
 - [Task](https://taskfile.dev) (`go-task`)
 
 ### 启动后端
@@ -29,9 +58,18 @@ task api
 task ui
 ```
 
-在 `comments-tree-web/` 目录下安装依赖并启动 Vue.js 开发服务器，访问 `http://localhost:8080`。
+在 `comments-tree-web/` 目录下安装依赖并启动 Vite 开发服务器，访问 `http://localhost:5173`。
 
 > 开发模式下前端通过 `/api` 代理转发请求到后端 `localhost:8081`。
+
+### 运行测试
+
+```bash
+task test        # 单元测试
+task test-it     # 集成测试
+task e2e         # e2e 测试（需前后端已启动）
+task test-all    # 以上全部（需前后端已启动）
+```
 
 ### 查看所有可用命令
 
