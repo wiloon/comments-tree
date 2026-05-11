@@ -19,6 +19,6 @@ public class Browser {
 
     public void run(String url) throws IOException {
         logger.info("open url: {}", url);
-        Runtime.getRuntime().exec(command + " " + url);
+        Runtime.getRuntime().exec(new String[]{command, url});
     }
 }

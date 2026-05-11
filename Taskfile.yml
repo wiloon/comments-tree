@@ -1,0 +1,39 @@
+version: '3'
+
+tasks:
+  default:
+    cmds:
+      - task --list
+
+  api:
+    desc: Start backend (Spring Boot)
+    cmds:
+      - mvn clean package -Dmaven.test.skip=true -DskipFrontend=true -pl comments-tree-api -am
+      - java -jar comments-tree-api/target/comments-tree-api-1.0.0.jar
+
+  ui:
+    desc: Start frontend dev server (Vue.js)
+    dir: comments-tree-web
+    cmds:
+      - bash -c 'eval "$(fnm env --shell bash)" && fnm use 18.20.8 && npm install --registry=https://registry.npmmirror.com && npm run serve'
+
+  e2e:
+    desc: Run Playwright e2e tests (requires frontend and backend already running)
+    dir: comments-tree-web
+    cmds:
+      - bash -c 'eval "$(fnm env --shell bash)" && fnm use 18.20.8 && npm run test:e2e:pw'
+
+  test:
+    desc: Run unit tests only
+    cmds:
+      - mvn test -pl comments-tree-api -am -DskipFrontend=true
+
+  test-it:
+    desc: Run integration tests only (requires unit tests to pass first)
+    cmds:
+      - mvn failsafe:integration-test failsafe:verify -pl comments-tree-api -am -DskipFrontend=true
+
+  test-all:
+    desc: Run unit tests and integration tests
+    cmds:
+      - mvn verify -pl comments-tree-api -am -DskipFrontend=true

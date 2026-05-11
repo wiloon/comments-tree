@@ -3,11 +3,8 @@ package com.wiloon.comments.user;
 import com.wiloon.comments.common.CommonResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 /**
@@ -15,17 +12,20 @@ import org.springframework.web.bind.annotation.*;
  *
  * @author wiloon
  */
-@Controller
+@RestController
 public class UserController {
     private static final Logger logger = LoggerFactory.getLogger(UserController.class);
-    @Autowired
-    UserService userService;
+
+    private final UserService userService;
+
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     /**
      * 用户注册
      */
     @RequestMapping(value = "/user", method = RequestMethod.POST)
-    @ResponseBody
     public CommonResult<String> register(@RequestBody User params) {
         logger.info("user register, params: {}", params);
         String name = params.getName();
@@ -47,7 +47,6 @@ public class UserController {
      * @return 用户信息
      */
     @RequestMapping(value = "/session", method = RequestMethod.GET)
-    @ResponseBody
     public CommonResult sessionCheck() {
         logger.info("session check");
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

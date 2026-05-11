@@ -12,6 +12,6 @@ public class MacOsEnvironmentCondition implements Condition {
 
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
         logger.info("env, property, os name: {}", context.getEnvironment().getProperty("os.name"));
-        return context.getEnvironment().getProperty("os.name").indexOf("Mac") >= 0;
+        return context.getEnvironment().getProperty("os.name").contains("Mac");
     }
 }

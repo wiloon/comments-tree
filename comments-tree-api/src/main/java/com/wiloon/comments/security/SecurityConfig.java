@@ -1,21 +1,18 @@
 package com.wiloon.comments.security;
 
 import com.wiloon.comments.user.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.config.annotation.web.configurers.ExpressionUrlAuthorizationConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
@@ -30,47 +27,46 @@ import javax.sql.DataSource;
  */
 @Configuration
 @EnableWebSecurity
-@EnableGlobalMethodSecurity(prePostEnabled = true)
-public class SecurityConfig extends WebSecurityConfigurerAdapter {
-    @Autowired
-    UserService userService;
-    @Autowired
-    DataSource dataSource;
+@EnableMethodSecurity(prePostEnabled = true)
+public class SecurityConfig {
 
-    @Override
-    protected void configure(HttpSecurity httpSecurity) throws Exception {
-        ExpressionUrlAuthorizationConfigurer<HttpSecurity>.ExpressionInterceptUrlRegistry registry = httpSecurity.authorizeRequests();
-        // white list
-        // vue 编译后的静态文件路径
-        registry.antMatchers("/index.html").permitAll();
-        registry.antMatchers("/favicon.ico").permitAll();
-        registry.antMatchers("/css/*").permitAll();
-        registry.antMatchers("/fonts/*").permitAll();
-        registry.antMatchers("/js/*").permitAll();
-// 用户登录
-        registry.antMatchers(HttpMethod.POST, "/session").permitAll();
-        // session 检查
-        registry.antMatchers(HttpMethod.GET, "/session").permitAll();
-        // 查询 comments 列表
-        registry.antMatchers("/comments").permitAll();
-        // 用户 注册
-        registry.antMatchers("/user").permitAll();
+    private final UserService userService;
+    private final DataSource dataSource;
+    private final PasswordEncoder passwordEncoder;
 
-        // 跨域的 OPTIONS 请求
-        registry.antMatchers(HttpMethod.OPTIONS).permitAll();
+    public SecurityConfig(UserService userService, DataSource dataSource, PasswordEncoder passwordEncoder) {
+        this.userService = userService;
+        this.dataSource = dataSource;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-        // logout
-        registry.and().logout()
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
+        httpSecurity.authorizeRequests()
+                // vue 编译后的静态文件路径
+                .antMatchers("/index.html").permitAll()
+                .antMatchers("/favicon.ico").permitAll()
+                .antMatchers("/css/*").permitAll()
+                .antMatchers("/fonts/*").permitAll()
+                .antMatchers("/js/*").permitAll()
+                // 用户登录
+                .antMatchers(HttpMethod.POST, "/session").permitAll()
+                // session 检查
+                .antMatchers(HttpMethod.GET, "/session").permitAll()
+                // 查询 comments 列表
+                .antMatchers("/comments").permitAll()
+                // 用户注册
+                .antMatchers("/user").permitAll()
+                // 跨域的 OPTIONS 请求
+                .antMatchers(HttpMethod.OPTIONS).permitAll()
+                .anyRequest().authenticated()
+                .and().logout()
                 .logoutUrl("/logout")
                 // 登出成功handler
                 .logoutSuccessHandler(logoutSuccessHandler())
                 .deleteCookies("JSESSIONID")
-                .and().authorizeRequests()
-                .anyRequest()
-                .authenticated()
                 // 关闭 csrf
-                .and().csrf()
-                .disable()
+                .and().csrf().disable()
                 .sessionManagement()
                 // 使用session
                 .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
@@ -83,7 +79,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .rememberMeParameter("rememberMe")
                 .tokenRepository(persistentTokenRepository())
                 .tokenValiditySeconds(30 * 24 * 60 * 60)
-                .userDetailsService(userDetailsService())
+                .userDetailsService(userService)
                 // form login
                 .and().formLogin()
                 .loginProcessingUrl("/session")
@@ -93,7 +89,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // form login auth failed handler
                 .failureHandler(formLoginFailedHandler());
 
-
+        return httpSecurity.build();
     }
 
     @Bean
@@ -119,26 +115,17 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         return jdbcTokenRepository;
     }
 
-    @Override
-    public UserDetailsService userDetailsService() {
-        return userService;
-    }
-
-    @Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService())
-                .passwordEncoder(passwordEncoder());
+    @Bean
+    public DaoAuthenticationProvider authenticationProvider() {
+        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
+        provider.setUserDetailsService(userService);
+        provider.setPasswordEncoder(passwordEncoder);
+        return provider;
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    @Override
-    public AuthenticationManager authenticationManagerBean() throws Exception {
-        return super.authenticationManagerBean();
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+        return config.getAuthenticationManager();
     }
 
     @Bean

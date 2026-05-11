@@ -6,21 +6,21 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class BrowserConfig {
-    @Bean("browser")
+    @Bean
     @Conditional(LinuxEnvironmentCondition.class)
-    public Browser linuxBrowserCommand() {
+    public Browser linuxBrowser() {
         return new LinuxBrowser();
     }
 
-    @Bean("browser")
+    @Bean
     @Conditional(WindowsEnvironmentCondition.class)
-    public Browser windowsBrowserCommand() {
+    public Browser windowsBrowser() {
         return new Browser("rundll32 url.dll,FileProtocolHandler");
     }
 
-    @Bean("browser")
-    @Conditional(WindowsEnvironmentCondition.class)
-    public Browser macOsBrowserCommand() {
+    @Bean
+    @Conditional(MacOsEnvironmentCondition.class)
+    public Browser macOsBrowser() {
         return new MacOsBrowser();
     }
 }

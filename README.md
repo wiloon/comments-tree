@@ -1,5 +1,46 @@
 # Java web+数据库题目2：无限层级留言
 
+## 背景
+
+这是 2022 年面试某远程职位时对方给出的带回家面试题，限时一周完成。题目要求实现一个前后端分离的树形留言评论系统。当时我只有 Java 经验，没有在生产项目中使用过 Spring Boot，代码是一边查资料一边开发、在一周内完成的。
+
+2026 年为准备面试一个 Java Spring Boot 职位，重新整理了项目，升级了 JDK 及部分依赖包版本，补充了 Taskfile 以方便本地开发启动。
+
+## 本地开发启动
+
+### 依赖
+
+- JDK 17+
+- Maven 3.6+
+- Node.js 16.13.2（通过 [fnm](https://github.com/Schniz/fnm) 管理）
+- [Task](https://taskfile.dev) (`go-task`)
+
+### 启动后端
+
+```bash
+task api
+```
+
+编译 Spring Boot 后端（跳过测试和前端构建）并启动，监听 `http://localhost:8081`。
+
+### 启动前端开发服务器
+
+```bash
+task ui
+```
+
+在 `comments-tree-web/` 目录下安装依赖并启动 Vue.js 开发服务器，访问 `http://localhost:8080`。
+
+> 开发模式下前端通过 `/api` 代理转发请求到后端 `localhost:8081`。
+
+### 查看所有可用命令
+
+```bash
+task
+```
+
+---
+
 ## 难度
 
 普通

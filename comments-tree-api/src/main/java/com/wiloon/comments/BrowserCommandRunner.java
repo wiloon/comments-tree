@@ -32,8 +32,7 @@ public class BrowserCommandRunner implements CommandLineRunner {
             try {
                 browser.run(loginUrl);
             } catch (Exception ex) {
-                ex.printStackTrace();
-                logger.error("failed to invoke browser, url: {}", loginUrl);
+                logger.error("failed to invoke browser, url: {}", loginUrl, ex);
             }
         }
     }

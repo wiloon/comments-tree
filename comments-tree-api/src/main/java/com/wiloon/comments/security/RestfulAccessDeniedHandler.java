@@ -1,7 +1,7 @@
 package com.wiloon.comments.security;
 
+import com.alibaba.fastjson.JSON;
 import com.wiloon.comments.common.CommonResult;
-import org.eclipse.jetty.util.ajax.JSON;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.AccessDeniedException;
@@ -24,7 +24,7 @@ public class RestfulAccessDeniedHandler implements AccessDeniedHandler {
                        AccessDeniedException e) throws IOException {
         logger.debug("restful access denied handler.");
         response.setContentType("application/json;charset=utf-8");
-        response.getWriter().println(JSON.toString(CommonResult.forbidden(e.getMessage())));
+        response.getWriter().println(JSON.toJSONString(CommonResult.forbidden(e.getMessage())));
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);
         response.getWriter().flush();
     }

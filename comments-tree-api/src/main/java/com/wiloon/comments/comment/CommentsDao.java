@@ -1,6 +1,5 @@
 package com.wiloon.comments.comment;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -15,8 +14,12 @@ import java.util.List;
  */
 @Repository
 public class CommentsDao {
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
+
+    private final JdbcTemplate jdbcTemplate;
+
+    public CommentsDao(JdbcTemplate jdbcTemplate) {
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     /**
      * 查询所有留言和评论，关联 comments 表和 comments_tree_path 表，原始数据。

@@ -12,7 +12,7 @@ public class LinuxEnvironmentCondition implements Condition {
 
     public boolean matches(ConditionContext context, AnnotatedTypeMetadata metadata) {
         logger.info("env, property, os name: {}", context.getEnvironment().getProperty("os.name"));
-        return (context.getEnvironment().getProperty("os.name").indexOf("nux") >= 0
-                || context.getEnvironment().getProperty("os.name").indexOf("aix") >= 0);
+        return (context.getEnvironment().getProperty("os.name").contains("nux")
+                || context.getEnvironment().getProperty("os.name").contains("aix"));
     }
 }

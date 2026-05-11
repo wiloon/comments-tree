@@ -3,12 +3,12 @@ package com.wiloon.comments.user;
 import com.wiloon.comments.common.Utils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.sql.Timestamp;
@@ -17,26 +17,42 @@ import java.util.UUID;
 @Service
 public class UserService implements UserDetailsService {
     private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
-    private static final BCryptPasswordEncoder bcryptPasswordEncoder = new BCryptPasswordEncoder();
+
+    private final JdbcTemplate jdbcTemplate;
+    private final PasswordEncoder passwordEncoder;
+
+    public UserService(JdbcTemplate jdbcTemplate, PasswordEncoder passwordEncoder) {
+        this.jdbcTemplate = jdbcTemplate;
+        this.passwordEncoder = passwordEncoder;
+    }
 
     public User getUserByName(String name) {
-        return jdbcTemplate.queryForObject("SELECT * FROM users where name=?", new UserRowMapper(), name);
+        try {
+            return jdbcTemplate.queryForObject("SELECT * FROM users where name=?", new UserRowMapper(), name);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     public User getUserByEmail(String email) {
-        return jdbcTemplate.queryForObject("SELECT * FROM users where email=?", new UserRowMapper(), email);
+        try {
+            return jdbcTemplate.queryForObject("SELECT * FROM users where email=?", new UserRowMapper(), email);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     public User getUserById(String id) {
-        return jdbcTemplate.queryForObject("SELECT * FROM users where id=?", new UserRowMapper(), id);
+        try {
+            return jdbcTemplate.queryForObject("SELECT * FROM users where id=?", new UserRowMapper(), id);
+        } catch (EmptyResultDataAccessException e) {
+            return null;
+        }
     }
 
     public String hashPassword(String password) {
-        return bcryptPasswordEncoder.encode(password);
+        return passwordEncoder.encode(password);
     }
-
 
     public boolean isUserRegistered(String name, String email) {
         String sql = "SELECT count(*) FROM users WHERE NAME=? OR email=?";
@@ -55,22 +71,22 @@ public class UserService implements UserDetailsService {
     public UserDetails loadUserByUsername(String nameOrEmail) throws UsernameNotFoundException {
         logger.info("loadUserByUsername: {}", nameOrEmail);
         User user = getUserByNameOrEmail(nameOrEmail);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found: " + nameOrEmail);
+        }
         return new CommentsTreeUserDetails(user);
     }
 
     public User getUserByNameOrEmail(String nameOrEmail) {
-        User user;
         if (Utils.isEmail(nameOrEmail)) {
-            user = getUserByEmail(nameOrEmail);
+            return getUserByEmail(nameOrEmail);
         } else {
-            user = getUserByName(nameOrEmail);
+            return getUserByName(nameOrEmail);
         }
-        return user;
     }
 
     public void deleteUser(String id) {
         String sql = "delete from  users  where id=?";
-
         jdbcTemplate.update(sql, id);
     }
 }

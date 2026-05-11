@@ -65,8 +65,8 @@
     <v-row>
       <!-- 树形留言 -->
       <v-treeview
+        :key="treeKey"
         open-all
-        :open="nodeOpen"
         :items="items"
         item-text="content"
         item-children="reply"
@@ -114,8 +114,8 @@ export default class Home extends Vue {
   dialog = false
   commentContent = ''
   items = []
+  treeKey = 0
   replyCommentId = 0
-  nodeOpen = []
   commentsFormValid = true
   commentLabel = '留言'
   commentSaving = false
@@ -158,7 +158,8 @@ export default class Home extends Vue {
           console.log('/comments, invalid response')
           return
         }
-        this.items = response.data.data.reply
+        this.items = response.data.data
+        this.treeKey++
       }
     )
   }
