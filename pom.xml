@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.6.3</version>
+        <version>2.7.18</version>
         <relativePath/>
     </parent>
 
@@ -21,7 +21,7 @@
         <module>comments-tree-api</module>
     </modules>
     <properties>
-        <spring.boot.version>2.6.3</spring.boot.version>
+        <spring.boot.version>2.7.18</spring.boot.version>
         <start-class>com.wiloon.comments.CommentsTree</start-class>
     </properties>
 
