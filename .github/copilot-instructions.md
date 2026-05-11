@@ -16,8 +16,8 @@
 
 ## Testing
 
-- **Unit tests** → suffix `*Test`, use `@RunWith(MockitoJUnitRunner.class)` + `@Mock` + `@InjectMocks`. No Spring context.
-- **Integration tests** → suffix `*IT`, use `@RunWith(SpringRunner.class)` + `@SpringBootTest` + `@AutoConfigureMockMvc`.
+- **Unit tests** → suffix `*Test`, use `@ExtendWith(MockitoExtension.class)` + `@Mock` + `@InjectMocks`. No Spring context.
+- **Integration tests** → suffix `*IT`, use `@SpringBootTest` + `@AutoConfigureMockMvc`.
 - `mvn test` runs only unit tests; `mvn verify` runs both.
 
 ## Spring Security

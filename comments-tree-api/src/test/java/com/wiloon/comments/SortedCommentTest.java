@@ -4,21 +4,21 @@ import com.wiloon.comments.comment.Comment;
 import com.wiloon.comments.comment.CommentService;
 import com.wiloon.comments.comment.CommentsDao;
 import com.wiloon.comments.comment.CommentsTreeNode;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.junit.jupiter.MockitoExtension;
+
+import org.junit.jupiter.api.Assertions;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.TreeSet;
 
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class SortedCommentTest {
 
     @Mock
@@ -43,18 +43,18 @@ public class SortedCommentTest {
 
         Mockito.when(commentsDao.getAllComments()).thenReturn(list);
         TreeSet<CommentsTreeNode> topComments = commentService.getSortedComments();
-        Assert.assertNotNull(topComments);
-        Assert.assertEquals(3, topComments.size());
-        Assert.assertEquals(3, (int) topComments.first().getComment().getId());
-        Assert.assertEquals(1, topComments.last().getId());
-        Assert.assertEquals(5, topComments.last()       // 1
+        Assertions.assertNotNull(topComments);
+        Assertions.assertEquals(3, topComments.size());
+        Assertions.assertEquals(3, (int) topComments.first().getComment().getId());
+        Assertions.assertEquals(1, topComments.last().getId());
+        Assertions.assertEquals(5, topComments.last()       // 1
                 .getReply().first().getId());
-        Assert.assertEquals(4, topComments.last()       // 1
+        Assertions.assertEquals(4, topComments.last()       // 1
                 .getReply().last().getId());             // 4
-        Assert.assertEquals(6, topComments.last()       // 1
+        Assertions.assertEquals(6, topComments.last()       // 1
                 .getReply().last()                       // 4
                 .getReply().first().getId());
-        Assert.assertEquals(7, topComments.first()      // 3
+        Assertions.assertEquals(7, topComments.first()      // 3
                 .getReply().last().getId());
     }
 }

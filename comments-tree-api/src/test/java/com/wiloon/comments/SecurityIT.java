@@ -1,13 +1,11 @@
 package com.wiloon.comments;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import static org.hamcrest.Matchers.not;
@@ -19,7 +17,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  * SecurityFilterChain 集成测试
  * 验证：SecurityConfig 改用 SecurityFilterChain Bean 后权限配置是否正确
  */
-@RunWith(SpringRunner.class)
 @SpringBootTest
 @AutoConfigureMockMvc
 public class SecurityIT {
