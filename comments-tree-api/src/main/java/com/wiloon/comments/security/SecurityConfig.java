@@ -42,52 +42,45 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
-        httpSecurity.authorizeRequests()
-                // vue 编译后的静态文件路径
-                .antMatchers("/index.html").permitAll()
-                .antMatchers("/favicon.ico").permitAll()
-                .antMatchers("/css/*").permitAll()
-                .antMatchers("/fonts/*").permitAll()
-                .antMatchers("/js/*").permitAll()
-                // 用户登录
-                .antMatchers(HttpMethod.POST, "/session").permitAll()
-                // session 检查
-                .antMatchers(HttpMethod.GET, "/session").permitAll()
-                // 查询 comments 列表
-                .antMatchers("/comments").permitAll()
-                // 用户注册
-                .antMatchers("/user").permitAll()
-                // 跨域的 OPTIONS 请求
-                .antMatchers(HttpMethod.OPTIONS).permitAll()
-                .anyRequest().authenticated()
-                .and().logout()
-                .logoutUrl("/logout")
-                // 登出成功handler
-                .logoutSuccessHandler(logoutSuccessHandler())
-                .deleteCookies("JSESSIONID")
-                // 关闭 csrf
-                .and().csrf().disable()
-                .sessionManagement()
-                // 使用session
-                .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
-                // 自定义权限拒绝类
-                .and().exceptionHandling()
-                .accessDeniedHandler(restfulAccessDeniedHandler())
-                .authenticationEntryPoint(restAuthenticationEntryPoint())
-                // remember me
-                .and().rememberMe()
-                .rememberMeParameter("rememberMe")
-                .tokenRepository(persistentTokenRepository())
-                .tokenValiditySeconds(30 * 24 * 60 * 60)
-                .userDetailsService(userService)
-                // form login
-                .and().formLogin()
-                .loginProcessingUrl("/session")
-                .usernameParameter("nameOrEmail")
-                // form login auth success handler
-                .successHandler(loginAuthenticationSuccessHandler())
-                // form login auth failed handler
-                .failureHandler(formLoginFailedHandler());
+        httpSecurity
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/index.html").permitAll()
+                        .requestMatchers("/favicon.ico").permitAll()
+                        .requestMatchers("/css/*").permitAll()
+                        .requestMatchers("/fonts/*").permitAll()
+                        .requestMatchers("/js/*").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/session").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/session").permitAll()
+                        .requestMatchers("/comments").permitAll()
+                        .requestMatchers("/user").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .logout(logout -> logout
+                        .logoutUrl("/logout")
+                        .logoutSuccessHandler(logoutSuccessHandler())
+                        .deleteCookies("JSESSIONID")
+                )
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.ALWAYS)
+                )
+                .exceptionHandling(ex -> ex
+                        .accessDeniedHandler(restfulAccessDeniedHandler())
+                        .authenticationEntryPoint(restAuthenticationEntryPoint())
+                )
+                .rememberMe(rm -> rm
+                        .rememberMeParameter("rememberMe")
+                        .tokenRepository(persistentTokenRepository())
+                        .tokenValiditySeconds(30 * 24 * 60 * 60)
+                        .userDetailsService(userService)
+                )
+                .formLogin(form -> form
+                        .loginProcessingUrl("/session")
+                        .usernameParameter("nameOrEmail")
+                        .successHandler(loginAuthenticationSuccessHandler())
+                        .failureHandler(formLoginFailedHandler())
+                );
 
         return httpSecurity.build();
     }

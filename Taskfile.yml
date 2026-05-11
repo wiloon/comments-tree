@@ -12,7 +12,7 @@ tasks:
       - java -jar comments-tree-api/target/comments-tree-api-1.0.0.jar
 
   ui:
-    desc: Start frontend dev server (Vue.js)
+    desc: Start frontend dev server (Vite)
     dir: comments-tree-web
     cmds:
       - bash -c 'eval "$(fnm env --shell bash)" && fnm use 18.20.8 && npm install --registry=https://registry.npmmirror.com && npm run serve'
@@ -34,6 +34,8 @@ tasks:
       - mvn failsafe:integration-test failsafe:verify -pl comments-tree-api -am -DskipFrontend=true
 
   test-all:
-    desc: Run unit tests and integration tests
+    desc: Run unit tests, integration tests, and e2e tests (requires frontend and backend already running)
     cmds:
-      - mvn verify -pl comments-tree-api -am -DskipFrontend=true
+      - mvn test -pl comments-tree-api -am -DskipFrontend=true
+      - mvn failsafe:integration-test failsafe:verify -pl comments-tree-api -am -DskipFrontend=true
+      - bash -c 'cd comments-tree-web && eval "$(fnm env --shell bash)" && fnm use 18.20.8 && npx playwright test'

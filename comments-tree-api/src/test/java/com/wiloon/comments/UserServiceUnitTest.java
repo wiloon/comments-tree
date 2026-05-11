@@ -3,17 +3,17 @@ package com.wiloon.comments;
 import com.wiloon.comments.user.User;
 import com.wiloon.comments.user.UserRowMapper;
 import com.wiloon.comments.user.UserService;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
@@ -21,7 +21,7 @@ import static org.mockito.Mockito.when;
  * UserService 单元测试
  * 验证：构造器注入、queryForObject 空结果处理、PasswordEncoder 注入
  */
-@RunWith(MockitoJUnitRunner.class)
+@ExtendWith(MockitoExtension.class)
 public class UserServiceUnitTest {
 
     @Mock
@@ -96,11 +96,12 @@ public class UserServiceUnitTest {
 
     // --- loadUserByUsername 用户不存在时抛出 UsernameNotFoundException ---
 
-    @Test(expected = org.springframework.security.core.userdetails.UsernameNotFoundException.class)
+    @Test
     public void loadUserByUsername_notFound_throwsException() {
         when(jdbcTemplate.queryForObject(anyString(), any(UserRowMapper.class), eq("ghost")))
                 .thenThrow(new EmptyResultDataAccessException(1));
 
-        userService.loadUserByUsername("ghost");
+        assertThrows(org.springframework.security.core.userdetails.UsernameNotFoundException.class,
+                () -> userService.loadUserByUsername("ghost"));
     }
 }

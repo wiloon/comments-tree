@@ -1,7 +1,6 @@
 <template>
-  <div id="app">
-    <v-app>
-      <v-dialog v-model="dialog" persistent max-width="600px" min-width="360px">
+  <div>
+    <v-dialog v-model="dialog" persistent max-width="600px" min-width="360px">
         <div>
           <v-card class="px-4">
             <v-card-text>
@@ -84,7 +83,6 @@
           </v-btn>
         </template>
       </v-snackbar>
-    </v-app>
   </div>
 </template>
 

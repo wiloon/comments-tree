@@ -7,7 +7,7 @@ This file provides instructions for AI agents (GitHub Copilot, OpenAI Codex, etc
 ## Project Overview
 
 **comments-tree** is a threaded comment system with:
-- **Backend**: Spring Boot 2.6.3, Spring Security 5.6, SQLite (prod), H2 (test), Jetty, Java 8 target
+- **Backend**: Spring Boot 3.5.14, Spring Security 6.x, SQLite (prod), H2 (test), Jetty, Java 17 target
 - **Frontend**: Vue.js 2.x + TypeScript + Vuetify 2.x
 - **Build**: Maven 3.x (multi-module), Node.js via fnm
 - **Dev runner**: [Task](https://taskfile.dev) (`Taskfile.yml`)
@@ -72,13 +72,13 @@ Taskfile.yml         # dev convenience tasks
 
 ### Unit tests (`*Test.java`)
 - Suffix: `*Test` — picked up by **maven-surefire-plugin** (`mvn test`)
-- Runner: `@RunWith(MockitoJUnitRunner.class)`
+- Runner: `@ExtendWith(MockitoExtension.class)`
 - Use `@Mock` + `@InjectMocks`; no Spring context
 - No `@SpringBootTest`, no `@MockBean`, no `@Autowired`
 
 ### Integration tests (`*IT.java`)
 - Suffix: `*IT` — picked up by **maven-failsafe-plugin** (`mvn verify`)
-- Runner: `@RunWith(SpringRunner.class)` + `@SpringBootTest` + `@AutoConfigureMockMvc`
+- Runner: `@SpringBootTest` + `@AutoConfigureMockMvc`
 - Full Spring context with H2 in-memory DB (configured in `src/test/resources/application.properties`)
 
 ### When to use which

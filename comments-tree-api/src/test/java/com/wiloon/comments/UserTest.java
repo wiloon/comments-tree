@@ -3,14 +3,11 @@ package com.wiloon.comments;
 import com.wiloon.comments.user.CommentsTreeUserDetails;
 import com.wiloon.comments.user.User;
 import com.wiloon.comments.user.UserService;
-import org.junit.Assert;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.junit.jupiter.api.Assertions;
 
-@RunWith(SpringRunner.class)
 @SpringBootTest
 public class UserTest {
     @Autowired
@@ -22,10 +19,10 @@ public class UserTest {
         String email="foo@bar.com";
         String id = userService.userRegister(userName, email, "password0");
         User user = userService.getUserById(id);
-        Assert.assertNotNull(user);
+        Assertions.assertNotNull(user);
         userService.deleteUser(id);
         Boolean exist =  userService.isUserRegistered(userName,email);
-        Assert.assertFalse(exist);
+        Assertions.assertFalse(exist);
     }
 
     @Test public void testUserDetail(){
@@ -34,8 +31,8 @@ public class UserTest {
         String id = userService.userRegister(userName, email, "password0");
         User user = userService.getUserById(id);
         CommentsTreeUserDetails commentsTreeUserDetails = new CommentsTreeUserDetails(user);
-        Assert.assertEquals(userName,commentsTreeUserDetails.getUsername());
-        Assert.assertNotNull(commentsTreeUserDetails.getUserId());
+        Assertions.assertEquals(userName,commentsTreeUserDetails.getUsername());
+        Assertions.assertNotNull(commentsTreeUserDetails.getUserId());
         userService.deleteUser(id);
 
     }
