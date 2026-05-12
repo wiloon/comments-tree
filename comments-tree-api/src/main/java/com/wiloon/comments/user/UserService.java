@@ -1,8 +1,7 @@
 package com.wiloon.comments.user;
 
 import com.wiloon.comments.common.Utils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,10 +13,9 @@ import org.springframework.stereotype.Service;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+@Slf4j
 @Service
 public class UserService implements UserDetailsService {
-    private static final Logger logger = LoggerFactory.getLogger(UserService.class);
-
     private final JdbcTemplate jdbcTemplate;
     private final PasswordEncoder passwordEncoder;
 
@@ -69,7 +67,7 @@ public class UserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String nameOrEmail) throws UsernameNotFoundException {
-        logger.info("loadUserByUsername: {}", nameOrEmail);
+        log.info("loadUserByUsername: {}", nameOrEmail);
         User user = getUserByNameOrEmail(nameOrEmail);
         if (user == null) {
             throw new UsernameNotFoundException("User not found: " + nameOrEmail);

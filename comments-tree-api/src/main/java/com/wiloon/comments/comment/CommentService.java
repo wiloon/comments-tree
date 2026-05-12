@@ -1,7 +1,6 @@
 package com.wiloon.comments.comment;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -12,10 +11,9 @@ import java.util.*;
  *
  * @author wiloon
  */
+@Slf4j
 @Service
 public class CommentService {
-    private static final Logger logger = LoggerFactory.getLogger(CommentService.class);
-
     private final CommentsDao commentsDao;
 
     public CommentService(CommentsDao commentsDao) {
@@ -23,38 +21,38 @@ public class CommentService {
     }
 
     /**
-     * 排序后的留言和评论
+     * Returns comments sorted in tree structure
      *
-     * @return comments 树形结构的根节点
+     * @return root node of the comments tree
      */
     public TreeSet<CommentsTreeNode> getSortedComments() {
         List<Comment> comments = commentsDao.getAllComments();
-        logger.debug("comments size: {}", comments.size());
-        // 临时 map 用于收集留言依赖关系
+        log.debug("comments size: {}", comments.size());
+        // Temporary map for collecting comment dependencies
         // key: comment id, value: comment tree node
         Map<Integer, CommentsTreeNode> tmpMap = new HashMap<>(comments.size() + 1);
         for (Comment comment : comments) {
-            // 循环填充留言树
-            logger.debug("parent id: {}, comment id: {}", comment.getParentId(), comment.getId());
-            // 留言包装成 tree node
+            // Fill the comment tree in loop
+            log.debug("parent id: {}, comment id: {}", comment.getParentId(), comment.getId());
+            // Wrap comment into tree node
             CommentsTreeNode currentNode = CommentsTreeNode.newNode(comment);
             int parentId = currentNode.getParentId();
             int id = currentNode.getId();
             if (!tmpMap.containsKey(parentId)) {
-                // 如果父节点不在map里，创建一个虚拟的 tree node 加入 map, 创建根节点或者数据库返回无序列表时，预先创建父节点
+                // If parent node not in map, create a virtual tree node; handles root node creation or out-of-order DB results
                 tmpMap.put(currentNode.getParentId(), CommentsTreeNode.newNode(currentNode.getParentId()));
             }
-            // 从map里取出父节点
+            // Retrieve parent node from map
             CommentsTreeNode parentNode = tmpMap.get(parentId);
-            // 把当前节点加到父节点的评论集合里
+            // Add current node to parent's reply collection
             parentNode.addReply(currentNode);
-            logger.debug("comment id: {}, reply size: {}", parentNode.getId(), parentNode.getReplySize());
+            log.debug("comment id: {}, reply size: {}", parentNode.getId(), parentNode.getReplySize());
             if (!tmpMap.containsKey(id) || tmpMap.get(id).getParentId() == -1) {
-                //把自己的引用加到map里，方便收集评论
+                // Add self reference to map for collecting replies
                 tmpMap.put(id, currentNode);
             }
         }
-        // 返回留言树
+        // Return the comment tree
         if (tmpMap.get(Comment.ROOT_NODE_ID) == null) {
             return null;
         } else {
@@ -64,12 +62,12 @@ public class CommentService {
     }
 
     /**
-     * 新建留言/评论
+     * Create a new comment
      *
-     * @param content  留言内容
-     * @param userId   用户 ID
-     * @param parentId 本留言的父节点 ID
-     * @return 本留言/评论 的 ID, comments 表自增主键新值
+     * @param content  comment text
+     * @param userId   user ID
+     * @param parentId parent node ID of this comment
+     * @return ID of the new comment (auto-increment primary key)
      */
 
     @Transactional(rollbackFor = Exception.class)

@@ -1,12 +1,11 @@
 package com.wiloon.comments.common.browser;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 
+@Slf4j
 public class Browser {
-    private static final Logger logger = LoggerFactory.getLogger(Browser.class);
     protected String command;
 
     public Browser() {
@@ -18,7 +17,7 @@ public class Browser {
     }
 
     public void run(String url) throws IOException {
-        logger.info("open url: {}", url);
+        log.info("open url: {}", url);
         Runtime.getRuntime().exec(new String[]{command, url});
     }
 }

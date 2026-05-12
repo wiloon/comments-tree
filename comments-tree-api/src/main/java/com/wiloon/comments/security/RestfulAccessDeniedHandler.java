@@ -2,8 +2,7 @@ package com.wiloon.comments.security;
 
 import com.alibaba.fastjson.JSON;
 import com.wiloon.comments.common.CommonResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 
@@ -15,14 +14,13 @@ import java.io.IOException;
  * restful access denied handler
  * @author wiloon
  */
+@Slf4j
 public class RestfulAccessDeniedHandler implements AccessDeniedHandler {
-    private static final Logger logger = LoggerFactory.getLogger(RestfulAccessDeniedHandler.class);
-
     @Override
     public void handle(HttpServletRequest request,
                        HttpServletResponse response,
                        AccessDeniedException e) throws IOException {
-        logger.debug("restful access denied handler.");
+        log.debug("restful access denied handler.");
         response.setContentType("application/json;charset=utf-8");
         response.getWriter().println(JSON.toJSONString(CommonResult.forbidden(e.getMessage())));
         response.setStatus(HttpServletResponse.SC_FORBIDDEN);

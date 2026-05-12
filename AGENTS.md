@@ -31,6 +31,7 @@ Taskfile.yml         # dev convenience tasks
   - Exception messages
   - Test method names and assertion messages
 - Chinese text is only acceptable in end-user facing UI strings (e.g., frontend `<template>` display text) and `application.properties` descriptions if they were already in Chinese.
+- **When modifying or creating any file, convert all existing Chinese comments, Javadoc, and log/exception messages in that file to English.**
 
 ### Taskfile (`Taskfile.yml`)
 - Task `desc` fields and inline comments **must be in English**.

@@ -1,7 +1,6 @@
 package com.wiloon.comments;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.io.ClassPathResource;
@@ -18,10 +17,9 @@ import java.sql.SQLException;
 /**
  * init sqlite db
  */
+@Slf4j
 @Component
 public class Init implements ApplicationRunner {
-    private static final Logger logger = LoggerFactory.getLogger(Init.class);
-
     private final JdbcTemplate jdbcTemplate;
 
     public Init(JdbcTemplate jdbcTemplate) {
@@ -30,7 +28,7 @@ public class Init implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        logger.info("application started, init sqlite tables");
+        log.info("application started, init sqlite tables");
 
         jdbcTemplate.execute((ConnectionCallback<Object>) con -> {
             con.setAutoCommit(false);
@@ -38,7 +36,7 @@ public class Init implements ApplicationRunner {
             EncodedResource encodedResource = new EncodedResource(classPathResource, "utf-8");
             ScriptUtils.executeSqlScript(con, encodedResource);
             con.commit();
-            logger.info("sql executed: {}", classPathResource.getPath());
+            log.info("sql executed: {}", classPathResource.getPath());
             return null;
         });
     }

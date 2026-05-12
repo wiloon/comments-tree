@@ -2,8 +2,7 @@ package com.wiloon.comments.security;
 
 import com.alibaba.fastjson.JSON;
 import com.wiloon.comments.common.CommonResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -16,15 +15,14 @@ import java.io.IOException;
  * JSON Login success response
  * @author wiloon
  */
+@Slf4j
 public class DefaultAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
-    private static final Logger logger = LoggerFactory.getLogger(DefaultAuthenticationSuccessHandler.class);
-
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException {
-        logger.debug("name: {}", authentication.getName());
+        log.debug("name: {}", authentication.getName());
 
         response.setContentType("application/json;charset=utf-8");
-        response.getWriter().println(JSON.toJSONString(CommonResult.success("登录成功")));
+        response.getWriter().println(JSON.toJSONString(CommonResult.success("Login successful")));
         response.setStatus(HttpServletResponse.SC_OK);
         response.flushBuffer();
     }

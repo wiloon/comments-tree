@@ -5,6 +5,7 @@
 - All code you write (Java, TypeScript, Vue) must use **English** for identifiers, comments, Javadoc, and log messages.
 - `Taskfile.yml` task descriptions and comments must be in **English**.
 - Chinese is only acceptable in end-user UI display strings already present in the frontend templates.
+- When modifying or creating any file, **convert all existing Chinese comments, Javadoc, and log/exception messages in that file to English**.
 
 ## Java Style
 
