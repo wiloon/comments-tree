@@ -1,10 +1,10 @@
-# Java web+数据库题目2：无限层级留言
+# comments-tree：无限层级留言系统
 
 ## 背景
 
-这是 2022 年面试某远程职位时对方给出的带回家面试题，限时一周完成。题目要求实现一个前后端分离的树形留言评论系统。当时我只有 Java 经验，没有在生产项目中使用过 Spring Boot，代码是一边查资料一边开发、在一周内完成的。
+这是一个前后端分离的树形留言评论系统，使用 Spring Boot 3.x + Vue.js 2.x 实现，支持无限层级嵌套评论、用户注册/登录（含 Remember Me）、BCrypt 密码加密等功能。
 
-2026 年为准备面试一个 Java Spring Boot 职位，重新整理了项目，进行了以下升级：
+2026 年对项目进行了全面升级：
 
 - **Java 8 → Java 17**，**Spring Boot 2.6.3 → 3.5.14**（Jakarta EE、Spring Security 6.x Lambda DSL、JUnit 5）
 - **Vue CLI（webpack 4）→ Vite 4**（解决 Node 18 + OpenSSL 3 兼容性问题）

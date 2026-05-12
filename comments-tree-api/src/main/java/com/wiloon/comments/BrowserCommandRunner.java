@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 /**
  * Auto-runs after Spring Boot container starts
  */
-// @Component
+@Component
 @Slf4j
 public class BrowserCommandRunner implements CommandLineRunner {
     @Value("${spring.web.loginurl}")

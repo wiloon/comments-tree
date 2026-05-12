@@ -5,20 +5,20 @@ import java.util.Date;
 import java.util.Objects;
 
 /**
- * 留言/评论，关联查询用
+ * Comment entity, used for join queries
  *
  * @author wiloon
  */
 public class Comment extends CommentRaw {
     public static final int ROOT_NODE_ID = 0;
     /**
-     * 父节点id
+     * Parent node id
      */
     @NotNull
     private Integer parentId;
 
     /**
-     * 用户信息
+     * User information
      */
     private String userName;
 

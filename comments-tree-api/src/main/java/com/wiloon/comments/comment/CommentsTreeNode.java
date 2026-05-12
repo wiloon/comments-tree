@@ -6,16 +6,16 @@ import java.util.Date;
 import java.util.TreeSet;
 
 /**
- * 留言树节点
+ * Comment tree node
  * @author wiloon
  */
 public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     /**
-     * 留言
+     * Comment
      */
     private Comment comment;
     /**
-     * 此条留言的评论集合
+     * Replies to this comment
      */
     private TreeSet<CommentsTreeNode> reply;
 
@@ -24,10 +24,10 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     }
 
     /**
-     * 创建一个新的留言节点
+     * Create a new comment node
      *
-     * @param comment 留言
-     * @return 树节点
+     * @param comment the comment
+     * @return tree node
      */
     public static CommentsTreeNode newNode(Comment comment) {
         CommentsTreeNode node = new CommentsTreeNode();
@@ -37,10 +37,10 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     }
 
     /**
-     * 创建一个虚拟的节点，如: 虚拟的根节点。
+     * Create a virtual node, e.g. a virtual root node.
      *
-     * @param commentID 留言id
-     * @return 树节点
+     * @param commentID comment id
+     * @return tree node
      */
     public static CommentsTreeNode newNode(int commentID) {
         CommentsTreeNode node = new CommentsTreeNode();
@@ -63,19 +63,19 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     }
 
     /**
-     * 向留言树填充留言的直接评论
+     * Add a direct reply to this comment node
      *
-     * @param node 评论节点
+     * @param node reply node
      */
     public void addReply(CommentsTreeNode node) {
         reply.add(node);
     }
 
     /**
-     * 比较同一层的留言顺序按更新日期倒序
+     * Compare nodes at the same level by update time in descending order
      *
-     * @param o 留言
-     * @return 相等: 0, 时间更新: -1, 时间更旧: 1
+     * @param o the other node
+     * @return 0 if equal, -1 if newer, 1 if older
      */
     @Override
     public int compareTo(CommentsTreeNode o) {
@@ -88,9 +88,9 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     }
 
     /**
-     * 获取留言的评论
+     * Get replies to this comment
      *
-     * @return 评论集合
+     * @return reply set
      */
     public TreeSet<CommentsTreeNode> getReply() {
         return reply;

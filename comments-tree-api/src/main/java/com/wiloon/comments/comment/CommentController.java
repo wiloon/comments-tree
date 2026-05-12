@@ -6,7 +6,6 @@ import com.wiloon.comments.user.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.validation.annotation.Validated;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,7 +21,6 @@ import java.util.TreeSet;
  */
 @Slf4j
 @RestController
-@Validated
 public class CommentController {
     private final UserService userService;
     private final CommentService commentService;
