@@ -23,6 +23,16 @@ tasks:
     cmds:
       - bash -c 'eval "$(fnm env --shell bash)" && fnm use 18.20.8 && npm run test:e2e:pw'
 
+  build:
+    desc: Build backend jar only (skip frontend and tests)
+    cmds:
+      - mvn clean package -Dmaven.test.skip=true -DskipFrontend=true -pl comments-tree-api -am
+
+  build-full:
+    desc: Build jar with frontend and backend bundled together (skip tests)
+    cmds:
+      - mvn clean package -Dmaven.test.skip=true -pl comments-tree-api -am
+
   test:
     desc: Run unit tests only
     cmds:

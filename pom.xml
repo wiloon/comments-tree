@@ -22,7 +22,6 @@
     </modules>
     <properties>
         <spring.boot.version>3.5.14</spring.boot.version>
-        <start-class>com.wiloon.comments.CommentsTree</start-class>
     </properties>
 
     <build>
@@ -61,7 +60,6 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <version>${spring.boot.version}</version>
                 <configuration>
-                    <mainClass>${start-class}</mainClass>
                     <layout>ZIP</layout>
                 </configuration>
                 <executions>

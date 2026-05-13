@@ -6,3 +6,5 @@
 **/node
 **/static
 **/dist
+**/playwright-report
+**/test-results

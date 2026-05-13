@@ -53,6 +53,8 @@ public class SecurityConfig {
                         .requestMatchers("/comments").permitAll()
                         .requestMatchers("/user").permitAll()
                         .requestMatchers(HttpMethod.OPTIONS).permitAll()
+                        .requestMatchers("/actuator/health").permitAll()
+                        .requestMatchers("/actuator/info").permitAll()
                         .anyRequest().authenticated()
                 )
                 .logout(logout -> logout
