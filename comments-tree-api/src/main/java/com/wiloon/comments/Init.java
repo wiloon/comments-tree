@@ -5,39 +5,37 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.support.EncodedResource;
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ConnectionCallback;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.datasource.init.ScriptUtils;
 import org.springframework.stereotype.Component;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
-import java.sql.SQLException;
 
 /**
- * init sqlite db
+ * Initialize SQLite schema on startup
  */
 @Slf4j
 @Component
 public class Init implements ApplicationRunner {
-    private final JdbcTemplate jdbcTemplate;
 
-    public Init(JdbcTemplate jdbcTemplate) {
-        this.jdbcTemplate = jdbcTemplate;
+    private final DataSource dataSource;
+
+    public Init(DataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     @Override
     public void run(ApplicationArguments args) {
         log.info("application started, init sqlite tables");
-
-        jdbcTemplate.execute((ConnectionCallback<Object>) con -> {
-            con.setAutoCommit(false);
-            ClassPathResource classPathResource = new ClassPathResource("jdbc/schema.sql");
-            EncodedResource encodedResource = new EncodedResource(classPathResource, "utf-8");
-            ScriptUtils.executeSqlScript(con, encodedResource);
-            con.commit();
+        ClassPathResource classPathResource = new ClassPathResource("jdbc/schema.sql");
+        EncodedResource encodedResource = new EncodedResource(classPathResource, "utf-8");
+        try (Connection connection = dataSource.getConnection()) {
+            connection.setAutoCommit(false);
+            ScriptUtils.executeSqlScript(connection, encodedResource);
+            connection.commit();
             log.info("sql executed: {}", classPathResource.getPath());
-            return null;
-        });
+        } catch (Exception e) {
+            throw new IllegalStateException("failed to initialize database schema", e);
+        }
     }
 }

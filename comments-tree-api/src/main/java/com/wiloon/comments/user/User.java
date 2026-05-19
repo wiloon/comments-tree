@@ -2,22 +2,46 @@ package com.wiloon.comments.user;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Transient;
+import org.springframework.data.domain.Persistable;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
+
+import java.sql.Timestamp;
 
 /**
- * 用户
+ * User entity
+ *
  * @author wiloon
  */
-public class User {
-    public static final String ANONYMOUS_USER="anonymousUser";
+@Table("users")
+public class User implements Persistable<String> {
+
+    @Transient
+    private boolean newEntity = true;
+    public static final String ANONYMOUS_USER = "anonymousUser";
+
+    @Id
+    @Column("id")
     private String id;
+
     @NotBlank
     @Size(min = 5, max = 20)
+    @Column("name")
     private String name;
-    @NotBlank
+
+    @NotBlank 
+    @Column("email")
     private String email;
+
     @NotBlank
     @Size(min = 8, max = 20)
-    private transient String password;
+    @Column("password")
+    private String password;
+
+    @Column("create_time")
+    private Timestamp createTime;
 
     public User() {
 
@@ -51,12 +75,30 @@ public class User {
         this.email = email;
     }
 
+    @Override
     public String getId() {
         return id;
     }
 
     public void setId(String id) {
         this.id = id;
+    }
+
+    @Override
+    public boolean isNew() {
+        return newEntity;
+    }
+
+    public void setNewEntity(boolean newEntity) {
+        this.newEntity = newEntity;
+    }
+
+    public Timestamp getCreateTime() {
+        return createTime;
+    }
+
+    public void setCreateTime(Timestamp createTime) {
+        this.createTime = createTime;
     }
 
     @Override

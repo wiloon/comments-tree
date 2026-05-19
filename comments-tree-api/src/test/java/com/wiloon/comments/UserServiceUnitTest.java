@@ -1,31 +1,29 @@
 package com.wiloon.comments;
 
 import com.wiloon.comments.user.User;
-import com.wiloon.comments.user.UserRowMapper;
+import com.wiloon.comments.user.UserRepository;
 import com.wiloon.comments.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.when;
 
 /**
- * UserService 单元测试
- * 验证：构造器注入、queryForObject 空结果处理、PasswordEncoder 注入
+ * UserService unit tests: constructor injection, empty lookup handling, PasswordEncoder delegation
  */
 @ExtendWith(MockitoExtension.class)
 public class UserServiceUnitTest {
 
     @Mock
-    private JdbcTemplate jdbcTemplate;
+    private UserRepository userRepository;
 
     @Mock
     private PasswordEncoder passwordEncoder;
@@ -33,12 +31,9 @@ public class UserServiceUnitTest {
     @InjectMocks
     private UserService userService;
 
-    // --- queryForObject 空结果处理 ---
-
     @Test
     public void getUserByName_notFound_returnsNull() {
-        when(jdbcTemplate.queryForObject(anyString(), any(UserRowMapper.class), eq("nobody")))
-                .thenThrow(new EmptyResultDataAccessException(1));
+        when(userRepository.findByName("nobody")).thenReturn(Optional.empty());
 
         User result = userService.getUserByName("nobody");
 
@@ -47,8 +42,7 @@ public class UserServiceUnitTest {
 
     @Test
     public void getUserByEmail_notFound_returnsNull() {
-        when(jdbcTemplate.queryForObject(anyString(), any(UserRowMapper.class), eq("no@body.com")))
-                .thenThrow(new EmptyResultDataAccessException(1));
+        when(userRepository.findByEmail("no@body.com")).thenReturn(Optional.empty());
 
         User result = userService.getUserByEmail("no@body.com");
 
@@ -57,15 +51,12 @@ public class UserServiceUnitTest {
 
     @Test
     public void getUserById_notFound_returnsNull() {
-        when(jdbcTemplate.queryForObject(anyString(), any(UserRowMapper.class), eq("nonexistent-id")))
-                .thenThrow(new EmptyResultDataAccessException(1));
+        when(userRepository.findById("nonexistent-id")).thenReturn(Optional.empty());
 
         User result = userService.getUserById("nonexistent-id");
 
         assertNull(result);
     }
-
-    // --- PasswordEncoder 注入验证（不再静态初始化）---
 
     @Test
     public void hashPassword_delegatesToInjectedEncoder() {
@@ -76,30 +67,23 @@ public class UserServiceUnitTest {
         assertEquals("hashed_value", result);
     }
 
-    // --- isUserRegistered ---
-
     @Test
     public void isUserRegistered_returnsTrueWhenExists() {
-        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), eq("alice"), eq("alice@example.com")))
-                .thenReturn(1);
+        when(userRepository.countByNameOrEmail("alice", "alice@example.com")).thenReturn(1L);
 
         assertTrue(userService.isUserRegistered("alice", "alice@example.com"));
     }
 
     @Test
     public void isUserRegistered_returnsFalseWhenNotExists() {
-        when(jdbcTemplate.queryForObject(anyString(), eq(Integer.class), eq("newuser"), eq("new@example.com")))
-                .thenReturn(0);
+        when(userRepository.countByNameOrEmail("newuser", "new@example.com")).thenReturn(0L);
 
         assertFalse(userService.isUserRegistered("newuser", "new@example.com"));
     }
 
-    // --- loadUserByUsername 用户不存在时抛出 UsernameNotFoundException ---
-
     @Test
     public void loadUserByUsername_notFound_throwsException() {
-        when(jdbcTemplate.queryForObject(anyString(), any(UserRowMapper.class), eq("ghost")))
-                .thenThrow(new EmptyResultDataAccessException(1));
+        when(userRepository.findByName("ghost")).thenReturn(Optional.empty());
 
         assertThrows(org.springframework.security.core.userdetails.UsernameNotFoundException.class,
                 () -> userService.loadUserByUsername("ghost"));

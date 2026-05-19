@@ -21,7 +21,7 @@ tasks:
     desc: Run Playwright e2e tests (requires frontend and backend already running)
     dir: comments-tree-web
     cmds:
-      - bash -c 'eval "$(fnm env --shell bash)" && fnm use 18.20.8 && npm run test:e2e:pw'
+      - bash -c 'eval "$(fnm env --shell bash)" && fnm use 18.20.8 && npm install --registry=https://registry.npmmirror.com && npm run test:e2e:pw'
 
   build:
     desc: Build backend jar only (skip frontend and tests)
@@ -44,8 +44,8 @@ tasks:
       - mvn failsafe:integration-test failsafe:verify -pl comments-tree-api -am -DskipFrontend=true
 
   test-all:
-    desc: Run unit tests, integration tests, and e2e tests (requires frontend and backend already running)
+    desc: Run unit tests, integration tests, and e2e tests (requires frontend and backend already running for e2e)
     cmds:
       - mvn test -pl comments-tree-api -am -DskipFrontend=true
       - mvn failsafe:integration-test failsafe:verify -pl comments-tree-api -am -DskipFrontend=true
-      - bash -c 'cd comments-tree-web && eval "$(fnm env --shell bash)" && fnm use 18.20.8 && npx playwright test'
+      - task: e2e

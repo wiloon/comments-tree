@@ -1,7 +1,6 @@
 package com.wiloon.comments;
 
 import com.wiloon.comments.comment.CommentService;
-import com.wiloon.comments.comment.CommentsDao;
 import com.wiloon.comments.comment.CommentsTreeNode;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -12,11 +11,9 @@ import java.util.TreeSet;
 
 @SpringBootTest
 public class CommentDaoTest {
-    @Autowired
-    CommentsDao commentsDao;
+
     @Autowired
     CommentService commentService;
-
 
     @Test
     public void test() {
@@ -25,6 +22,6 @@ public class CommentDaoTest {
         TreeSet<CommentsTreeNode> comments = commentService.getSortedComments();
         Assertions.assertNotNull(comments);
         Assertions.assertEquals(1, comments.size());
-        commentsDao.deleteComment(commentId);
+        commentService.deleteComment(commentId);
     }
 }

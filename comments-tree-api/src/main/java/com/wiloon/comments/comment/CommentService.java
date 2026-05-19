@@ -4,7 +4,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.sql.Timestamp;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeSet;
 
 /**
  * Comment service
@@ -14,10 +18,11 @@ import java.util.*;
 @Slf4j
 @Service
 public class CommentService {
-    private final CommentsDao commentsDao;
 
-    public CommentService(CommentsDao commentsDao) {
-        this.commentsDao = commentsDao;
+    private final CommentRepository commentRepository;
+
+    public CommentService(CommentRepository commentRepository) {
+        this.commentRepository = commentRepository;
     }
 
     /**
@@ -26,39 +31,28 @@ public class CommentService {
      * @return root node of the comments tree
      */
     public TreeSet<CommentsTreeNode> getSortedComments() {
-        List<Comment> comments = commentsDao.getAllComments();
+        List<Comment> comments = commentRepository.findAllCommentsWithTreePath();
         log.debug("comments size: {}", comments.size());
-        // Temporary map for collecting comment dependencies
-        // key: comment id, value: comment tree node
         Map<Integer, CommentsTreeNode> tmpMap = new HashMap<>(comments.size() + 1);
         for (Comment comment : comments) {
-            // Fill the comment tree in loop
             log.debug("parent id: {}, comment id: {}", comment.getParentId(), comment.getId());
-            // Wrap comment into tree node
             CommentsTreeNode currentNode = CommentsTreeNode.newNode(comment);
             int parentId = currentNode.getParentId();
             int id = currentNode.getId();
             if (!tmpMap.containsKey(parentId)) {
-                // If parent node not in map, create a virtual tree node; handles root node creation or out-of-order DB results
                 tmpMap.put(currentNode.getParentId(), CommentsTreeNode.newNode(currentNode.getParentId()));
             }
-            // Retrieve parent node from map
             CommentsTreeNode parentNode = tmpMap.get(parentId);
-            // Add current node to parent's reply collection
             parentNode.addReply(currentNode);
             log.debug("comment id: {}, reply size: {}", parentNode.getId(), parentNode.getReplySize());
             if (!tmpMap.containsKey(id) || tmpMap.get(id).getParentId() == -1) {
-                // Add self reference to map for collecting replies
                 tmpMap.put(id, currentNode);
             }
         }
-        // Return the comment tree
         if (tmpMap.get(Comment.ROOT_NODE_ID) == null) {
             return null;
-        } else {
-            return tmpMap.get(Comment.ROOT_NODE_ID).getReply();
         }
-
+        return tmpMap.get(Comment.ROOT_NODE_ID).getReply();
     }
 
     /**
@@ -69,12 +63,23 @@ public class CommentService {
      * @param parentId parent node ID of this comment
      * @return ID of the new comment (auto-increment primary key)
      */
-
     @Transactional(rollbackFor = Exception.class)
     public int newComment(String content, String userId, int parentId) {
-        int commentId = commentsDao.insertComment(content, userId);
-        commentsDao.insertCommentTreePath(parentId, commentId);
-        return commentId;
+        Timestamp now = new Timestamp(System.currentTimeMillis());
+        CommentEntity entity = new CommentEntity();
+        entity.setContent(content);
+        entity.setUserId(userId);
+        entity.setCreateTime(now);
+        entity.setUpdateTime(now);
+        CommentEntity saved = commentRepository.save(entity);
+        if (saved.getId() == null) {
+            throw new RuntimeException("failed to save comment");
+        }
+        commentRepository.insertTreePath(parentId, saved.getId());
+        return saved.getId();
+    }
 
+    public void deleteComment(int id) {
+        commentRepository.deleteById(id);
     }
 }

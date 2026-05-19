@@ -1,6 +1,8 @@
 package com.wiloon.comments.comment;
 
 import jakarta.validation.constraints.NotNull;
+
+import java.sql.Timestamp;
 import java.util.Date;
 import java.util.Objects;
 
@@ -29,7 +31,7 @@ public class Comment extends CommentRaw {
     public Comment(int parentId, int id, Date updateTime) {
         this.parentId = parentId;
         this.id = id;
-        this.updateTime = updateTime;
+        this.updateTime = new Timestamp(updateTime.getTime());
     }
 
     public Integer getParentId() {

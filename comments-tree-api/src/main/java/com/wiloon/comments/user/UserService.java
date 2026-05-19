@@ -2,8 +2,6 @@ package com.wiloon.comments.user;
 
 import com.wiloon.comments.common.Utils;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -16,36 +14,25 @@ import java.util.UUID;
 @Slf4j
 @Service
 public class UserService implements UserDetailsService {
-    private final JdbcTemplate jdbcTemplate;
+
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(JdbcTemplate jdbcTemplate, PasswordEncoder passwordEncoder) {
-        this.jdbcTemplate = jdbcTemplate;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     public User getUserByName(String name) {
-        try {
-            return jdbcTemplate.queryForObject("SELECT * FROM users where name=?", new UserRowMapper(), name);
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
+        return userRepository.findByName(name).orElse(null);
     }
 
     public User getUserByEmail(String email) {
-        try {
-            return jdbcTemplate.queryForObject("SELECT * FROM users where email=?", new UserRowMapper(), email);
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
+        return userRepository.findByEmail(email).orElse(null);
     }
 
     public User getUserById(String id) {
-        try {
-            return jdbcTemplate.queryForObject("SELECT * FROM users where id=?", new UserRowMapper(), id);
-        } catch (EmptyResultDataAccessException e) {
-            return null;
-        }
+        return userRepository.findById(id).orElse(null);
     }
 
     public String hashPassword(String password) {
@@ -53,16 +40,17 @@ public class UserService implements UserDetailsService {
     }
 
     public boolean isUserRegistered(String name, String email) {
-        String sql = "SELECT count(*) FROM users WHERE NAME=? OR email=?";
-        Integer count = jdbcTemplate.queryForObject(sql, Integer.class, name, email);
-        return count != null && count > 0;
+        return userRepository.countByNameOrEmail(name, email) > 0;
     }
 
     public String userRegister(String name, String email, String password) {
-        String sql = "INSERT INTO users (id,name,email,password,create_time) VALUES (?,?,?,?,?);";
-        String id = UUID.randomUUID().toString();
-        int result = jdbcTemplate.update(sql, id, name, email, hashPassword(password), new Timestamp(System.currentTimeMillis()));
-        return result > 0 ? id : "";
+        User user = new User();
+        user.setId(UUID.randomUUID().toString());
+        user.setName(name);
+        user.setEmail(email);
+        user.setPassword(hashPassword(password));
+        user.setCreateTime(new Timestamp(System.currentTimeMillis()));
+        return userRepository.save(user).getId();
     }
 
     @Override
@@ -78,13 +66,11 @@ public class UserService implements UserDetailsService {
     public User getUserByNameOrEmail(String nameOrEmail) {
         if (Utils.isEmail(nameOrEmail)) {
             return getUserByEmail(nameOrEmail);
-        } else {
-            return getUserByName(nameOrEmail);
         }
+        return getUserByName(nameOrEmail);
     }
 
     public void deleteUser(String id) {
-        String sql = "delete from  users  where id=?";
-        jdbcTemplate.update(sql, id);
+        userRepository.deleteById(id);
     }
 }

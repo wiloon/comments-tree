@@ -1,24 +1,29 @@
 package com.wiloon.comments.comment;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.relational.core.mapping.Column;
+import org.springframework.data.relational.core.mapping.Table;
 
 import java.sql.Timestamp;
 
-/**
- * Base comment fields shared by API models and projections.
- */
-public class CommentRaw {
+@Table("comments")
+public class CommentEntity {
 
-    protected Integer id;
+    @Id
+    @Column("id")
+    private Integer id;
 
-    @NotBlank
-    @Size(min = 3, max = 200)
-    protected String content;
+    @Column("content")
+    private String content;
 
-    protected Timestamp createTime;
+    @Column("user_id")
+    private String userId;
 
-    protected Timestamp updateTime;
+    @Column("create_time")
+    private Timestamp createTime;
+
+    @Column("update_time")
+    private Timestamp updateTime;
 
     public Integer getId() {
         return id;
@@ -34,6 +39,14 @@ public class CommentRaw {
 
     public void setContent(String content) {
         this.content = content;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public void setUserId(String userId) {
+        this.userId = userId;
     }
 
     public Timestamp getCreateTime() {

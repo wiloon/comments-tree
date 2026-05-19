@@ -2,7 +2,7 @@ package com.wiloon.comments.comment;
 
 import com.alibaba.fastjson.annotation.JSONField;
 
-import java.util.Date;
+import java.sql.Timestamp;
 import java.util.TreeSet;
 
 /**
@@ -113,7 +113,7 @@ public class CommentsTreeNode implements Comparable<CommentsTreeNode> {
     }
 
     @JSONField(format = "yyyy-MM-dd HH:mm:ss")
-    public Date getUpdateTime() {
+    public Timestamp getUpdateTime() {
         return this.comment.getUpdateTime();
     }
 

@@ -86,7 +86,7 @@ Taskfile.yml         # dev convenience tasks
 | Need                              | Test type                            |
 | --------------------------------- | ------------------------------------ |
 | Pure business logic, no I/O       | Unit test (`*Test`)                  |
-| Repository / SQL logic            | Unit test with mocked `JdbcTemplate` |
+| Repository / SQL logic            | Unit test with mocked Spring Data JDBC repositories |
 | HTTP routing, security, full flow | Integration test (`*IT`)             |
 
 ---
