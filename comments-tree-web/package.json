@@ -6,6 +6,7 @@
     "serve": "vite",
     "build": "vite build",
     "preview": "vite preview",
+    "serve:e2e": "vite build && vite preview",
     "test:unit": "jest",
     "test:e2e:pw": "playwright test",
     "lint": "eslint --ext .js,.jsx,.ts,.tsx,.vue src"

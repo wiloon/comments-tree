@@ -1,6 +1,7 @@
 import { test, expect, request } from '@playwright/test';
+import { gotoHome, loginUser } from './helpers';
 
-const BACKEND_URL = 'http://localhost:8081';
+const BACKEND_URL = process.env.COMMENTS_TREE_API_URL ?? 'http://localhost:8081';
 
 /**
  * Helper: register a new user directly via the backend API.
@@ -15,23 +16,7 @@ async function registerUserViaApi(username: string, email: string, password: str
   return res.ok();
 }
 
-/**
- * Helper: log in via the UI.
- * Waits for the logout button to appear as a positive confirmation of success.
- */
-async function loginUser(page: any, nameOrEmail: string, password: string) {
-  await page.click('[data-cy=login-dialog]');
-  // Wait for the login form to be visible before interacting
-  await page.waitForSelector('[data-cy=user-name]', { state: 'visible' });
-  await page.fill('[data-cy=user-name]', nameOrEmail);
-  await page.fill('[data-cy=password]', password);
-  await page.click('[data-cy=login]');
-  // Positive assertion: wait for the logout button to appear
-  await expect(page.locator('[data-cy=logout-dialog]')).toBeVisible({ timeout: 8000 });
-}
-
 test.describe('Comment flow', () => {
-  // Generate a unique user per test run so the suite is self-contained
   const timestamp = Date.now();
   const username = `testuser_${timestamp}`;
   const email = `testuser_${timestamp}@example.com`;
@@ -44,23 +29,24 @@ test.describe('Comment flow', () => {
     }
   });
 
+  test.beforeEach(async ({ context }) => {
+    await context.clearCookies();
+  });
+
   test('unauthenticated user sees the comment list', async ({ page }) => {
-    await page.goto('/');
-    // The login and register buttons should be visible
-    await expect(page.locator('[data-cy=login-dialog]')).toBeVisible();
+    await gotoHome(page);
     await expect(page.locator('[data-cy=register-dialog]')).toBeVisible();
-    // The "new comment" button should NOT be visible when logged out
     await expect(page.locator('[data-cy=comment-new]')).not.toBeVisible();
   });
 
   test('user can log in and the logout button appears', async ({ page }) => {
-    await page.goto('/');
+    await gotoHome(page);
     await loginUser(page, username, password);
     await expect(page.locator('[data-cy=logout-dialog]')).toBeVisible();
   });
 
   test('logged-in user can post a root comment', async ({ page }) => {
-    await page.goto('/');
+    await gotoHome(page);
     await loginUser(page, username, password);
 
     await page.click('[data-cy=comment-new]');
@@ -68,39 +54,34 @@ test.describe('Comment flow', () => {
     await page.fill('[data-cy=comment-text]', commentText);
     await page.click('[data-cy=comment-save]');
 
-    // After saving, the dialog should close and the comment should appear in the list
     await expect(page.locator('[data-cy=comment-new]')).toBeVisible({ timeout: 5000 });
     await expect(page.getByText(commentText)).toBeVisible({ timeout: 5000 });
   });
 
   test('logged-in user can reply to a comment', async ({ page }) => {
-    await page.goto('/');
+    await gotoHome(page);
     await loginUser(page, username, password);
 
-    // Post root comment first
     await page.click('[data-cy=comment-new]');
     const rootText = `Root comment for reply test ${timestamp}`;
     await page.fill('[data-cy=comment-text]', rootText);
     await page.click('[data-cy=comment-save]');
     await expect(page.getByText(rootText)).toBeVisible({ timeout: 5000 });
 
-    // Reply to the comment we just posted (newest = first in the list)
     await page.locator('[data-cy=reply-btn]').first().click();
     const replyText = `Reply to root comment ${timestamp}`;
     await page.fill('[data-cy=comment-text]', replyText);
     await page.click('[data-cy=comment-save]');
 
-    // Wait for dialog to close (save completed)
     await expect(page.locator('[data-cy=comment-save]')).not.toBeVisible({ timeout: 5000 });
 
-    // Reload so v-treeview open-all re-expands all nodes (including the new reply)
-    await page.reload();
+    await page.reload({ waitUntil: 'networkidle' });
     await expect(page.getByText(rootText)).toBeVisible({ timeout: 8000 });
     await expect(page.getByText(replyText)).toBeVisible({ timeout: 5000 });
   });
 
   test('user can log out', async ({ page }) => {
-    await page.goto('/');
+    await gotoHome(page);
     await loginUser(page, username, password);
     await expect(page.locator('[data-cy=logout-dialog]')).toBeVisible();
 

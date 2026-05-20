@@ -2,7 +2,6 @@ package com.wiloon.comments;
 
 import com.wiloon.comments.common.browser.Browser;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
@@ -13,16 +12,17 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class BrowserCommandRunner implements CommandLineRunner {
+    private final Browser browser;
+
     @Value("${spring.web.loginurl}")
     private String loginUrl;
 
     @Value("${spring.auto.openurl}")
     private boolean isOpen;
 
-    private String browserCommand;
-
-    @Autowired
-    Browser browser;
+    public BrowserCommandRunner(Browser browser) {
+        this.browser = browser;
+    }
 
     @Override
     public void run(String... args) {

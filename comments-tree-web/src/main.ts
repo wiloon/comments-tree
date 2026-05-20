@@ -10,9 +10,8 @@ import axios from 'axios'
 Vue.config.productionTip = false
 Vue.prototype.$axios = axios
 console.log('env: ' + import.meta.env.MODE)
-if (import.meta.env.MODE !== 'production') {
-  axios.defaults.baseURL = '/api'
-}
+// Dev and preview/prod builds both reach the backend via the /api proxy (Vite server or preview).
+axios.defaults.baseURL = '/api'
 new Vue({
   router,
   store,

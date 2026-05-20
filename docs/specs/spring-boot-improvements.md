@@ -46,10 +46,10 @@ The goal is to modernise the code to Spring Boot 2.6 / Spring Security 5.6 best 
 - [x] `UserService` and `SecurityConfig` must each inject `PasswordEncoder` independently.
 - [x] Verify: the application starts without `BeanCurrentlyInCreationException`.
 
-### R3 — Constructor injection throughout ⚠️ partial
+### R3 — Constructor injection throughout ✅
 
 - [x] All `@Service`, `@Repository`, `@RestController`, and `@Configuration` beans use constructor injection.
-- [ ] **Outstanding:** `BrowserCommandRunner` still uses `@Autowired` field injection for `Browser` (should be constructor-injected `private final Browser browser`).
+- [x] `BrowserCommandRunner` injects `Browser` via constructor (`private final Browser browser`).
 
 ### R4 — Controller conventions ⚠️ partial
 
@@ -184,7 +184,7 @@ All of the following must be true before the task is considered complete:
 - [x] `mvn verify -pl comments-tree-api -am -DskipFrontend=true` exits 0; both `*Test` and `*IT` classes run.
 - [ ] Unit tests (`SortedCommentTest`, `UserServiceUnitTest`, `CommentDaoTest`) do **not** load a Spring `ApplicationContext` — `SortedCommentTest` and `UserServiceUnitTest` OK; **`CommentDaoTest` still uses `@SpringBootTest`** (also `UserTest` loads context during `mvn test`).
 - [x] Integration tests (`SecurityIT`, `CommentsFlowIT`) load a full Spring context with H2.
-- [ ] No `@Autowired` field injection remains in production code — **`BrowserCommandRunner` still has `@Autowired Browser`**.
+- [x] No `@Autowired` field injection remains in production code.
 - [x] No `e.printStackTrace()` remains anywhere in the codebase.
 - [x] `SecurityConfig` does not extend `WebSecurityConfigurerAdapter`.
 - [x] The application starts without circular dependency errors.

@@ -6,5 +6,6 @@
 **/node
 **/static
 **/dist
+**/.vite-cache
 **/playwright-report
 **/test-results

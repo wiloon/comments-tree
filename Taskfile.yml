@@ -12,16 +12,28 @@ tasks:
       - java -jar comments-tree-api/target/comments-tree-api-1.0.0.jar
 
   ui:
-    desc: Start frontend dev server (Vite)
+    desc: Start frontend dev server (Vite on http://127.0.0.1:5173)
     dir: comments-tree-web
     cmds:
-      - bash -c 'eval "$(fnm env --shell bash)" && fnm use 18.20.8 && npm install --registry=https://registry.npmmirror.com && npm run serve'
+      - bash -c 'eval "$(fnm env --shell bash)" && fnm use 18.20.8 && if [ ! -d node_modules ]; then npm install --registry=https://registry.npmmirror.com; fi && npm run serve'
+
+  ui-clean-vite:
+    desc: Clear Vite caches (fixes ENOENT deps_temp / broken dev server)
+    dir: comments-tree-web
+    cmds:
+      - rm -rf node_modules/.vite .vite-cache
 
   e2e:
-    desc: Run Playwright e2e tests (requires frontend and backend already running)
+    desc: Run Playwright e2e (requires task api only; Playwright builds and serves UI on port 4173)
     dir: comments-tree-web
     cmds:
-      - bash -c 'eval "$(fnm env --shell bash)" && fnm use 18.20.8 && npm install --registry=https://registry.npmmirror.com && npm run test:e2e:pw'
+      - bash -c 'eval "$(fnm env --shell bash)" && fnm use 18.20.8 && if [ ! -d node_modules/@playwright ]; then npm install --registry=https://registry.npmmirror.com && npx playwright install chromium; fi && npm run test:e2e:pw'
+
+  e2e-install:
+    desc: Install frontend deps and Playwright browsers (run once, or when package.json changes)
+    dir: comments-tree-web
+    cmds:
+      - bash -c 'eval "$(fnm env --shell bash)" && fnm use 18.20.8 && npm install --registry=https://registry.npmmirror.com && npx playwright install chromium'
 
   build:
     desc: Build backend jar only (skip frontend and tests)
@@ -44,7 +56,7 @@ tasks:
       - mvn failsafe:integration-test failsafe:verify -pl comments-tree-api -am -DskipFrontend=true
 
   test-all:
-    desc: Run unit tests, integration tests, and e2e tests (requires frontend and backend already running for e2e)
+    desc: Run unit + integration + e2e (start task api first; e2e starts its own UI preview on 4173 — task ui not required)
     cmds:
       - mvn test -pl comments-tree-api -am -DskipFrontend=true
       - mvn failsafe:integration-test failsafe:verify -pl comments-tree-api -am -DskipFrontend=true
