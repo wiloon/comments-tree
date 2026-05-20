@@ -18,6 +18,8 @@ The `comments-tree-api` backend was written in 2022 and contains patterns that a
 
 The goal is to modernise the code to Spring Boot 2.6 / Spring Security 5.6 best practices and establish a proper unit-vs-integration test pyramid.
 
+> **Implementation status (2026-05-20):** Most requirements are done; **R3** and **R4** have minor gaps. See per-item markers below and [Acceptance Criteria](#acceptance-criteria).
+
 ---
 
 ## Goals
@@ -31,49 +33,49 @@ The goal is to modernise the code to Spring Boot 2.6 / Spring Security 5.6 best 
 
 ## Requirements
 
-### R1 — Spring Security modernisation
+### R1 — Spring Security modernisation ✅
 
-- Remove `extends WebSecurityConfigurerAdapter` from `SecurityConfig`.
-- Replace with a `@Bean SecurityFilterChain filterChain(HttpSecurity)` method.
-- Replace `@EnableGlobalMethodSecurity` with `@EnableMethodSecurity(prePostEnabled = true)`.
-- Expose `AuthenticationManager` as a `@Bean` via `AuthenticationConfiguration`.
+- [x] Remove `extends WebSecurityConfigurerAdapter` from `SecurityConfig`.
+- [x] Replace with a `@Bean SecurityFilterChain filterChain(HttpSecurity)` method.
+- [x] Replace `@EnableGlobalMethodSecurity` with `@EnableMethodSecurity(prePostEnabled = true)`.
+- [x] Expose `AuthenticationManager` as a `@Bean` via `AuthenticationConfiguration`.
 
-### R2 — Circular dependency resolution
+### R2 — Circular dependency resolution ✅
 
-- Extract `@Bean PasswordEncoder` into a dedicated `PasswordEncoderConfig` class.
-- `UserService` and `SecurityConfig` must each inject `PasswordEncoder` independently.
-- Verify: the application starts without `BeanCurrentlyInCreationException`.
+- [x] Extract `@Bean PasswordEncoder` into a dedicated `PasswordEncoderConfig` class.
+- [x] `UserService` and `SecurityConfig` must each inject `PasswordEncoder` independently.
+- [x] Verify: the application starts without `BeanCurrentlyInCreationException`.
 
-### R3 — Constructor injection throughout
+### R3 — Constructor injection throughout ⚠️ partial
 
-- All `@Service`, `@Repository`, `@RestController`, and `@Configuration` beans must use constructor injection only.
-- All injected fields must be `private final`.
-- No `@Autowired` on fields is permitted.
+- [x] All `@Service`, `@Repository`, `@RestController`, and `@Configuration` beans use constructor injection.
+- [ ] **Outstanding:** `BrowserCommandRunner` still uses `@Autowired` field injection for `Browser` (should be constructor-injected `private final Browser browser`).
 
-### R4 — Controller conventions
+### R4 — Controller conventions ⚠️ partial
 
-- Use `@RestController` (not `@Controller` + per-method `@ResponseBody`).
-- Validate request bodies with `@Validated` / `@Valid`.
+- [x] Use `@RestController` (not `@Controller` + per-method `@ResponseBody`).
+- [ ] **Outstanding:** `CommentController` uses `@Valid` on POST body; `UserController.register()` does not validate `@RequestBody User` with `@Valid` / `@Validated`.
 
-### R5 — Null safety in `CommentController`
+### R5 — Null safety in `CommentController` ✅
 
-- After `userService.getUserByNameOrEmail(name)`, check for `null` before accessing `user.getId()`.
-- Return `CommonResult.failed("Authenticated user not found")` when the user is not found.
+- [x] After `userService.getUserByNameOrEmail(name)`, check for `null` before accessing `user.getId()`.
+- [x] Return `CommonResult.failed("Authenticated user not found")` when the user is not found.
 
-### R6 — Logging & exception hygiene
+### R6 — Logging & exception hygiene ⚠️ partial
 
-- Replace every `e.printStackTrace()` with `logger.error("message", e)` (SLF4J).
-- Add `GlobalExceptionHandler` (`@RestControllerAdvice`) that catches `Exception`, logs it, and returns `CommonResult.failed("服务器内部错误")` with HTTP 500.
+- [x] Replace every `e.printStackTrace()` with `logger.error("message", e)` (SLF4J).
+- [x] Add `GlobalExceptionHandler` (`@RestControllerAdvice`) that catches `Exception`, logs it, and returns HTTP 500.
+- [ ] **Note:** handler message is `"Internal server error"` (English), not the spec's `"服务器内部错误"`.
 
-### R7 — Secure process execution
+### R7 — Secure process execution ✅
 
-- Replace `Runtime.getRuntime().exec(command + " " + url)` with `Runtime.getRuntime().exec(new String[]{command, url})`.
+- [x] Replace `Runtime.getRuntime().exec(command + " " + url)` with `Runtime.getRuntime().exec(new String[]{command, url})`.
 
-### R8 — JSON serialisation consistency
+### R8 — JSON serialisation consistency ✅
 
-- Replace `org.eclipse.jetty.util.ajax.JSON` (internal Jetty API) with `com.alibaba.fastjson.JSON.toJSONString()` in `RestAuthenticationEntryPoint` and `RestfulAccessDeniedHandler`.
+- [x] Replace `org.eclipse.jetty.util.ajax.JSON` (internal Jetty API) with `com.alibaba.fastjson.JSON.toJSONString()` in `RestAuthenticationEntryPoint` and `RestfulAccessDeniedHandler`.
 
-### R9 — Unit tests for `UserService` (no Spring context)
+### R9 — Unit tests for `UserService` (no Spring context) ✅
 
 Naming: `UserServiceUnitTest.java` (surefire picks it up via `*Test` pattern).
 
@@ -91,7 +93,7 @@ Required test cases:
 | `isUserRegistered_returnsFalse` | user not found | returns `false` |
 | `loadUserByUsername_notFound_throwsException` | user not found | throws `UsernameNotFoundException` |
 
-### R10 — Security integration tests (full Spring context)
+### R10 — Security integration tests (full Spring context) ✅
 
 Naming: `SecurityIT.java` (failsafe picks it up via `*IT` pattern).
 
@@ -108,7 +110,7 @@ Required test cases:
 | `sessionCheck_noAuth_returnsUnauthorizedJson` | GET /session, no credentials | HTTP 200, `$.code == 401` |
 | `options_noAuth_allowed` | OPTIONS /comment, no credentials | status ≠ 401 |
 
-### R11 — Full business-flow integration test
+### R11 — Full business-flow integration test ✅
 
 Naming: `CommentsFlowIT.java`.
 
@@ -123,21 +125,19 @@ The single test method must exercise the complete user journey in order:
 7. `GET /comments` → expect at least one comment in `$.data`
 8. `POST /comment` without session → expect HTTP 401
 
-### R12 — Refactor `SortedCommentTest` to pure unit test
+### R12 — Refactor `SortedCommentTest` to pure unit test ✅
 
-- Remove `@SpringBootTest`, `@MockBean`, `@Autowired`.
-- Replace with `@RunWith(MockitoJUnitRunner.class)`, `@Mock CommentsDao`, `@InjectMocks CommentService`.
-- Remove `try/catch ParseException`; declare `throws ParseException` on the test method instead.
+- [x] Remove `@SpringBootTest`, `@MockBean`, `@Autowired`.
+- [x] Replace with Mockito (`@ExtendWith(MockitoExtension.class)`), `@Mock CommentRepository`, `@InjectMocks CommentService`.
+- [x] Remove `try/catch ParseException`; declare `throws ParseException` on the test method instead.
 
-### R13 — Maven test phase separation
+### R13 — Maven test phase separation ✅
 
-- Add `maven-failsafe-plugin` (version `3.0.0-M7`) to `comments-tree-api/pom.xml`.
-- Bind goals `integration-test` and `verify`.
-- Verify:
-  - `mvn test -pl comments-tree-api -am` runs only `*Test` classes.
-  - `mvn verify -pl comments-tree-api -am -DskipFrontend=true` runs `*Test` + `*IT` classes.
+- [x] Add `maven-failsafe-plugin` (version `3.0.0-M7`) to `comments-tree-api/pom.xml`.
+- [x] Bind goals `integration-test` and `verify`.
+- [x] Verified: `mvn test` runs `*Test` only; `mvn verify` runs `*Test` + `*IT` (2026-05-20).
 
-### R14 — H2 test resources
+### R14 — H2 test resources ✅
 
 Create `src/test/resources/application.properties`:
 ```properties
@@ -148,9 +148,9 @@ spring.auto.openurl=false
 
 Create `src/test/resources/jdbc/schema.sql` with an H2-compatible version of the production schema (use `AUTO_INCREMENT`, not SQLite's `AUTOINCREMENT`).
 
-### R15 — Taskfile tasks
+### R15 — Taskfile tasks ✅
 
-Add three tasks to `Taskfile.yml` with English `desc` fields:
+Added three tasks to `Taskfile.yml` with English `desc` fields:
 
 | Task name | Command | Description |
 |---|---|---|
@@ -158,10 +158,10 @@ Add three tasks to `Taskfile.yml` with English `desc` fields:
 | `test-it` | `mvn failsafe:integration-test failsafe:verify ...` | Run integration tests only |
 | `test-all` | `mvn verify -pl comments-tree-api -am -DskipFrontend=true` | Run unit tests and integration tests |
 
-### R16 — AI documentation
+### R16 — AI documentation ✅
 
-- Create `AGENTS.md` at the repository root covering: project overview, language policy, Java/Spring conventions, testing conventions, key commands.
-- Create `.github/copilot-instructions.md` as a concise Copilot-readable version of the same rules.
+- [x] Create `AGENTS.md` at the repository root covering: project overview, language policy, Java/Spring conventions, testing conventions, key commands.
+- [x] Create `.github/copilot-instructions.md` as a concise Copilot-readable version of the same rules.
 
 ---
 
@@ -180,12 +180,12 @@ Add three tasks to `Taskfile.yml` with English `desc` fields:
 
 All of the following must be true before the task is considered complete:
 
-- [ ] `mvn test -pl comments-tree-api -am -DskipFrontend=true` exits 0; only `*Test` classes run; no `*IT` classes run.
-- [ ] `mvn verify -pl comments-tree-api -am -DskipFrontend=true` exits 0; both `*Test` and `*IT` classes run.
-- [ ] Unit tests (`SortedCommentTest`, `UserServiceUnitTest`, `CommentDaoTest`) do **not** load a Spring `ApplicationContext`.
-- [ ] Integration tests (`SecurityIT`, `CommentsFlowIT`) load a full Spring context with H2.
-- [ ] No `@Autowired` field injection remains in production code.
-- [ ] No `e.printStackTrace()` remains anywhere in the codebase.
-- [ ] `SecurityConfig` does not extend `WebSecurityConfigurerAdapter`.
-- [ ] The application starts without circular dependency errors.
-- [ ] `task test`, `task test-it`, and `task test-all` all work from the repository root.
+- [x] `mvn test -pl comments-tree-api -am -DskipFrontend=true` exits 0; only `*Test` classes run; no `*IT` classes run.
+- [x] `mvn verify -pl comments-tree-api -am -DskipFrontend=true` exits 0; both `*Test` and `*IT` classes run.
+- [ ] Unit tests (`SortedCommentTest`, `UserServiceUnitTest`, `CommentDaoTest`) do **not** load a Spring `ApplicationContext` — `SortedCommentTest` and `UserServiceUnitTest` OK; **`CommentDaoTest` still uses `@SpringBootTest`** (also `UserTest` loads context during `mvn test`).
+- [x] Integration tests (`SecurityIT`, `CommentsFlowIT`) load a full Spring context with H2.
+- [ ] No `@Autowired` field injection remains in production code — **`BrowserCommandRunner` still has `@Autowired Browser`**.
+- [x] No `e.printStackTrace()` remains anywhere in the codebase.
+- [x] `SecurityConfig` does not extend `WebSecurityConfigurerAdapter`.
+- [x] The application starts without circular dependency errors.
+- [x] `task test`, `task test-it`, and `task test-all` are defined in `Taskfile.yml` (not re-run in this audit).
