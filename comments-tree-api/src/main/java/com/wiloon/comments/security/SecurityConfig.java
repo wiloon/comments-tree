@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -31,12 +30,10 @@ public class SecurityConfig {
 
     private final UserService userService;
     private final DataSource dataSource;
-    private final PasswordEncoder passwordEncoder;
 
-    public SecurityConfig(UserService userService, DataSource dataSource, PasswordEncoder passwordEncoder) {
+    public SecurityConfig(UserService userService, DataSource dataSource) {
         this.userService = userService;
         this.dataSource = dataSource;
-        this.passwordEncoder = passwordEncoder;
     }
 
     @Bean
